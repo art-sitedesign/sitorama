@@ -1,6 +1,6 @@
 package core
 
-import "pet-projects/sitorama/app/core/docker"
+import "github.com/art-sitedesign/sitorama/app/core/docker"
 
 type Core struct {
 	docker *docker.Docker

@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"pet-projects/sitorama/app/handlers"
+	"github.com/art-sitedesign/sitorama/app/handlers"
 )
 
 func main() {
@@ -14,6 +14,7 @@ func main() {
 
 	http.HandleFunc("/", handlers.Index(tmpl))
 	http.HandleFunc("/init", handlers.Init(tmpl))
+	http.HandleFunc("/create", handlers.Create(tmpl))
 
 	fmt.Println("Open GUI: http://127.0.0.1:8085")
 	err := http.ListenAndServe(":8085", nil)

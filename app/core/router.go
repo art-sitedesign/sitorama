@@ -2,10 +2,11 @@ package core
 
 import (
 	"context"
-	"pet-projects/sitorama/app/core/docker"
 
 	"github.com/docker/docker/api/types"
 	"github.com/pkg/errors"
+
+	"github.com/art-sitedesign/sitorama/app/core/docker"
 )
 
 const RouterName = "router"
