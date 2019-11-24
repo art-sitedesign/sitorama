@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/pkg/errors"
@@ -64,23 +63,4 @@ func (r *Router) Create(ctx context.Context) (string, error) {
 
 func (r *Router) ContainerName() string {
 	return utils.RouterName
-}
-
-func (r *Router) State(ctx context.Context) *ServiceState {
-	container, err := r.Find(ctx)
-
-	ss := &ServiceState{
-		ID:     "",
-		Name:   "",
-		Active: false,
-	}
-
-	if err == nil && container != nil {
-		ss.ID = container.ID[:12]
-		ss.Name = container.Names[0][1:]
-		ss.Active = container.State == "running"
-		ss.CreateTime = time.Unix(container.Created, 0)
-	}
-
-	return ss
 }

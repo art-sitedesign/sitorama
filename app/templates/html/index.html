@@ -19,22 +19,54 @@
             <td>Действия</td>
         </tr>
         <tr>
-            <td>{{.State.RouterState.ID}}</td>
-            <td>{{.State.RouterState.Name}}</td>
+            <td>{{.State.Router.ID}}</td>
+            <td>{{.State.Router.Name}}</td>
             <td>
-                {{if .State.RouterState.Active}}
+                {{if .State.Router.Active}}
                     Активный
                 {{else}}
                     Неактивный
                 {{end}}
             </td>
-            <td>{{.State.RouterState.CreateTime}}</td>
+            <td>{{.State.Router.CreateTime}}</td>
             <td>
                 <button>Перезапустить</button>
                 <button>Остановить</button>
                 <button>Удалить</button>
             </td>
         </tr>
+    </table>
+</div>
+
+<div>
+    <h3>Состояние сервисов:</h3>
+    <table>
+        <tr>
+            <td>ID</td>
+            <td>Название</td>
+            <td>Статус</td>
+            <td>Время создания</td>
+            <td>Действия</td>
+        </tr>
+        {{range .State.Services}}
+        <tr>
+            <td>{{.ID}}</td>
+            <td>{{.Name}}</td>
+            <td>
+                {{if .Active}}
+                    Активный
+                {{else}}
+                    Неактивный
+                {{end}}
+            </td>
+            <td>{{.CreateTime}}</td>
+            <td>
+                <button>Перезапустить</button>
+                <button>Остановить</button>
+                <button>Удалить</button>
+            </td>
+        </tr>
+        {{end}}
     </table>
 </div>
 

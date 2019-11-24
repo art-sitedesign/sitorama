@@ -76,7 +76,3 @@ func (sn *SiteNginx) Create(ctx context.Context) (string, error) {
 func (sn *SiteNginx) ContainerName() string {
 	return utils.ContainerName(fmt.Sprintf("%s_nginx", sn.name))
 }
-
-func (sn *SiteNginx) State(ctx context.Context) *ServiceState {
-	return &ServiceState{}
-}
