@@ -2,9 +2,9 @@ package core
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/art-sitedesign/sitorama/app/core/services"
+	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
 type AppState struct {
@@ -12,18 +12,31 @@ type AppState struct {
 	Services []*services.State
 }
 
-func (c *Core) State(ctx context.Context) *AppState {
+func (c *Core) State(ctx context.Context) (*AppState, error) {
 	router := services.NewRouter(c.docker)
 
-	//todo: найти контейнеры, понять сайты и распарсить
-	snginx := services.NewSiteNginx(c.docker, "test.loc", fmt.Sprintf("%s.phpfpm", "test.loc"))
-	sphpfpm := services.NewSitePHPFPM(c.docker, "test.loc")
+	rContainer, err := router.Find(ctx)
+	rState := services.ContainerState(rContainer, utils.RouterName)
 
-	servs := make([]*services.State, 0, 2)
-	servs = append(servs, services.ServiceState(ctx, snginx), services.ServiceState(ctx, sphpfpm))
+	projects, err := c.FindProjects(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	servs := make([]*services.State, 0, len(projects)*2)
+
+	for projectName, containers := range projects {
+		if projectName == utils.RouterName {
+			continue
+		}
+
+		for _, container := range containers {
+			servs = append(servs, services.ContainerState(&container, projectName))
+		}
+	}
 
 	return &AppState{
-		Router:   services.ServiceState(ctx, router),
+		Router:   rState,
 		Services: servs,
-	}
+	}, nil
 }

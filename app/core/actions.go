@@ -13,3 +13,7 @@ func (c *Core) ContainerStop(ctx context.Context, cID string) error {
 func (c *Core) ContainerStart(ctx context.Context, cID string) error {
 	return c.docker.StartContainer(ctx, cID)
 }
+
+func (c *Core) ContainerRemove(ctx context.Context, cID string) error {
+	return c.docker.RemoveContainer(ctx, cID)
+}

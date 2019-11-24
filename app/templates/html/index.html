@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Sitorama</title>
 </head>
 <body>
 <h1>Привет! Это Sitorama</h1>
@@ -13,14 +13,16 @@
     <table>
         <tr>
             <td>ID</td>
-            <td>Название</td>
+            <td>Сервис</td>
+            <td>Контейнер</td>
             <td>Статус</td>
             <td>Время создания</td>
             <td>Действия</td>
         </tr>
         <tr>
             <td>{{.State.Router.ID}}</td>
-            <td>{{.State.Router.Name}}</td>
+            <td>{{.State.Router.ServiceName}}</td>
+            <td>{{.State.Router.ContainerName}}</td>
             <td>
                 {{if .State.Router.Active}}
                     Активный
@@ -30,9 +32,13 @@
             </td>
             <td>{{.State.Router.CreateTime}}</td>
             <td>
-                <button>Перезапустить</button>
-                <button>Остановить</button>
-                <button>Удалить</button>
+                {{if .State.Router.Active}}
+                    <a href="/container/restart?cid={{.State.Router.ID}}">Перезапустить</a>
+                    <a href="/container/stop?cid={{.State.Router.ID}}">Остановить</a>
+                {{else if .State.Router.CanStart}}
+                    <a href="/container/start?cid={{.State.Router.ID}}">Запустить</a>
+                    <a href="/container/remove?cid={{.State.Router.ID}}">Удалить</a>
+                {{end}}
             </td>
         </tr>
     </table>
@@ -43,7 +49,8 @@
     <table>
         <tr>
             <td>ID</td>
-            <td>Название</td>
+            <td>Сервис</td>
+            <td>Контейнер</td>
             <td>Статус</td>
             <td>Время создания</td>
             <td>Действия</td>
@@ -51,7 +58,8 @@
         {{range .State.Services}}
             <tr>
                 <td>{{.ID}}</td>
-                <td>{{.Name}}</td>
+                <td>{{.ServiceName}}</td>
+                <td>{{.ContainerName}}</td>
                 <td>
                     {{if .Active}}
                         Активный
@@ -61,13 +69,13 @@
                 </td>
                 <td>{{.CreateTime}}</td>
                 <td>
-                    <a href="/container/restart?cid={{.ID}}">Перезапустить</a>
                     {{if .Active}}
+                        <a href="/container/restart?cid={{.ID}}">Перезапустить</a>
                         <a href="/container/stop?cid={{.ID}}">Остановить</a>
                     {{else if .CanStart}}
                         <a href="/container/start?cid={{.ID}}">Запустить</a>
+                        <a href="/container/remove?cid={{.ID}}">Удалить</a>
                     {{end}}
-                    <button>Удалить</button>
                 </td>
             </tr>
         {{end}}
@@ -78,8 +86,6 @@
     <button type="submit">Инициализировать приложение</button>
 </form>
 
-<form action="/create">
-    <button type="submit">Создать</button>
-</form>
+<a href="/create">Создать проект!</a>
 </body>
 </html>

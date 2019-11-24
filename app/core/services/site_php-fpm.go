@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/art-sitedesign/sitorama/app/core/docker"
-	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
 type SitePHPFPM struct {
@@ -54,5 +53,5 @@ func (sp *SitePHPFPM) Create(ctx context.Context) (string, error) {
 }
 
 func (sp *SitePHPFPM) ContainerName() string {
-	return utils.ContainerName(fmt.Sprintf("%s_php-fpm", sp.name))
+	return fmt.Sprintf("%s_php-fpm", sp.name)
 }

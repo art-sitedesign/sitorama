@@ -1,30 +1,31 @@
 package services
 
 import (
-	"context"
 	"time"
+
+	"github.com/docker/docker/api/types"
 )
 
 type State struct {
-	ID         string
-	Name       string
-	Active     bool
-	CreateTime time.Time
+	ID            string
+	ServiceName   string
+	ContainerName string
+	Active        bool
+	CreateTime    time.Time
 }
 
 func (s *State) CanStart() bool {
 	return s.Active == false && s.ID != ""
 }
 
-// ServiceState вернет состояние сервиса
-func ServiceState(ctx context.Context, service Service) *State {
-	container, err := service.Find(ctx)
-
+// ContainerState вернёт состояние контейнера
+func ContainerState(container *types.Container, projectName string) *State {
 	ss := &State{}
 
-	if err == nil && container != nil {
+	if container != nil {
 		ss.ID = container.ID[:12]
-		ss.Name = container.Names[0][1:]
+		ss.ServiceName = projectName
+		ss.ContainerName = container.Names[0][1:]
 		ss.Active = container.State == "running"
 		ss.CreateTime = time.Unix(container.Created, 0)
 	}

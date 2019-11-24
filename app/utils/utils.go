@@ -3,7 +3,10 @@ package utils
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"text/template"
+
+	"github.com/docker/docker/api/types"
 )
 
 func RouterConfPath(name string) string {
@@ -25,4 +28,18 @@ func RenderTemplateInBuffer(templatePath string, data interface{}) (*bytes.Buffe
 	}
 
 	return &b, nil
+}
+
+// ProjectNameFromContainer вернёт название проекта по названию контейнера
+func ProjectNameFromContainer(c *types.Container) string {
+	//todo: сделать нормально!
+	cName := c.Names[0][1:]
+	cName = strings.Replace(cName, Prefix+"-", "", -1)
+	sp := strings.Split(cName, "_")
+
+	if len(sp) > 1 {
+		sp = sp[:len(sp)-1]
+	}
+
+	return strings.Join(sp, "_")
 }

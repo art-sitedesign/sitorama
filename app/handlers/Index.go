@@ -17,7 +17,10 @@ func Index(tmpl *template.Template) Handler {
 		}
 
 		data := make(map[string]interface{})
-		data["State"] = cr.State(context.Background())
+		data["State"], err = cr.State(context.Background())
+		if err != nil {
+			log.Fatalf("error: %v", err)
+		}
 
 		err = tmpl.ExecuteTemplate(w, "index.html", data)
 		if err != nil {

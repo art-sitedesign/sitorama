@@ -79,6 +79,16 @@ func (d *Docker) StopContainer(ctx context.Context, containerID string) error {
 	return d.client.ContainerStop(ctx, containerID, nil)
 }
 
+// RemoveContainer удалит контейнер
+func (d *Docker) RemoveContainer(ctx context.Context, containerID string) error {
+	options := types.ContainerRemoveOptions{
+		RemoveVolumes: false,
+		RemoveLinks:   false,
+		Force:         false,
+	}
+	return d.client.ContainerRemove(ctx, containerID, options)
+}
+
 // CopyToContainer скопирует данные в файловую систему контейнера
 func (d *Docker) CopyToContainer(ctx context.Context, containerID string, path string, fileName string, data *bytes.Buffer) error {
 	var buf bytes.Buffer
