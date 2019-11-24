@@ -9,7 +9,7 @@ import (
 
 type AppState struct {
 	Router   *services.State
-	Services []*services.State
+	Projects map[string][]*services.State
 }
 
 func (c *Core) State(ctx context.Context) (*AppState, error) {
@@ -18,25 +18,25 @@ func (c *Core) State(ctx context.Context) (*AppState, error) {
 	rContainer, err := router.Find(ctx)
 	rState := services.ContainerState(rContainer, utils.RouterName)
 
-	projects, err := c.FindProjects(ctx)
+	projectContainers, err := c.FindProjects(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	servs := make([]*services.State, 0, len(projects)*2)
+	projects := make(map[string][]*services.State)
 
-	for projectName, containers := range projects {
+	for projectName, cns := range projectContainers {
 		if projectName == utils.RouterName {
 			continue
 		}
 
-		for _, container := range containers {
-			servs = append(servs, services.ContainerState(&container, projectName))
+		for _, container := range cns {
+			projects[projectName] = append(projects[projectName], services.ContainerState(&container, projectName))
 		}
 	}
 
 	return &AppState{
 		Router:   rState,
-		Services: servs,
+		Projects: projects,
 	}, nil
 }
