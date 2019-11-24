@@ -2,6 +2,7 @@ package docker
 
 import (
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/go-connections/nat"
 )
 
@@ -80,6 +81,7 @@ func DefaultContainerHostConfig() *container.HostConfig {
 	}
 }
 
+// BindPorts собитер конфиги для проброса портов
 func BindPorts(ports map[string]string) (nat.PortSet, nat.PortMap) {
 	portSet := nat.PortSet{}
 	portMap := nat.PortMap{}
@@ -96,4 +98,23 @@ func BindPorts(ports map[string]string) (nat.PortSet, nat.PortMap) {
 	}
 
 	return portSet, portMap
+}
+
+// MakeVolumes собирет конфиги для вольюмов
+func MakeVolumes(volumes map[string]string) []mount.Mount {
+	res := make([]mount.Mount, 0, len(volumes))
+
+	for source, dest := range volumes {
+		res = append(res, mount.Mount{
+			Type:          "bind",
+			Source:        source,
+			Target:        dest,
+			ReadOnly:      false,
+			BindOptions:   nil,
+			VolumeOptions: nil,
+			TmpfsOptions:  nil,
+		})
+	}
+
+	return res
 }

@@ -15,7 +15,10 @@ func Create(tmpl *template.Template) Handler {
 			log.Fatalf("error: %v", err)
 		}
 
-		_ = cr
+		err = cr.CreateSite("test.loc")
+		if err != nil {
+			log.Fatalf("error: %v", err)
+		}
 
 		http.Redirect(w, r, "/", 302)
 	}

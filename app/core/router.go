@@ -2,11 +2,14 @@ package core
 
 import (
 	"context"
+	"os"
+	"path/filepath"
 
 	"github.com/docker/docker/api/types"
 	"github.com/pkg/errors"
 
 	"github.com/art-sitedesign/sitorama/app/core/docker"
+	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
 const RouterName = "router"
@@ -33,6 +36,19 @@ func (c *Core) createRouter(ctx context.Context) (string, error) {
 
 	hostConfig := docker.DefaultContainerHostConfig()
 	hostConfig.PortBindings = portMap
+
+	err := os.MkdirAll(utils.RouterConfDir, 0755)
+	if err != nil {
+		return "", err
+	}
+
+	path, err := filepath.Abs(utils.RouterConfDir)
+	if err != nil {
+		return "", err
+	}
+
+	volumes := docker.MakeVolumes(map[string]string{path: "/etc/nginx/conf.d/"})
+	hostConfig.Mounts = volumes
 
 	return c.docker.CreateContainer(ctx, RouterName, config, hostConfig)
 }

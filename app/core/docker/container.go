@@ -8,13 +8,15 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
+
+	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
 // CreateContainer создаст контейнер
 func (d *Docker) CreateContainer(ctx context.Context, name string, config *container.Config, hostConfig *container.HostConfig) (string, error) {
 	networkingConfig := &network.NetworkingConfig{}
 
-	res, err := d.client.ContainerCreate(ctx, config, hostConfig, networkingConfig, containerName(name))
+	res, err := d.client.ContainerCreate(ctx, config, hostConfig, networkingConfig, utils.ContainerName(name))
 	if err != nil {
 		return "", err
 	}
@@ -28,7 +30,7 @@ func (d *Docker) CreateContainer(ctx context.Context, name string, config *conta
 // FindContainers найдет контейнеры по названию
 func (d *Docker) FindContainers(ctx context.Context, name string) ([]types.Container, error) {
 	args := filters.NewArgs()
-	args.Add("name", containerName(name))
+	args.Add("name", utils.ContainerName(name))
 
 	opts := types.ContainerListOptions{
 		Quiet:   false,
@@ -54,6 +56,7 @@ func (d *Docker) StartContainer(ctx context.Context, containerID string) error {
 	return d.client.ContainerStart(ctx, containerID, options)
 }
 
-func containerName(s string) string {
-	return fmt.Sprintf("%s-%s", prefix, s)
+// RestartContainer перезапустит контейнер
+func (d *Docker) RestartContainer(ctx context.Context, containerID string) error {
+	return d.client.ContainerRestart(ctx, containerID, nil)
 }

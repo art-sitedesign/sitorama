@@ -7,6 +7,8 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/network"
+
+	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
 // CreateNetwork создаст новую подсеть для проекта
@@ -22,7 +24,7 @@ func (d *Docker) CreateNetwork(ctx context.Context) (string, error) {
 		Labels:         nil,
 	}
 
-	res, err := d.client.NetworkCreate(ctx, prefix, options)
+	res, err := d.client.NetworkCreate(ctx, utils.Prefix, options)
 	if err != nil {
 		return "", err
 	}
@@ -36,7 +38,7 @@ func (d *Docker) CreateNetwork(ctx context.Context) (string, error) {
 // FindNetwork найдет подсеть проекта
 func (d *Docker) FindNetwork(ctx context.Context) (*types.NetworkResource, error) {
 	args := filters.NewArgs()
-	args.Add("name", prefix)
+	args.Add("name", utils.Prefix)
 	options := types.NetworkListOptions{Filters: args}
 
 	networks, err := d.client.NetworkList(ctx, options)

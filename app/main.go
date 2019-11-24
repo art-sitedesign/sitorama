@@ -9,8 +9,12 @@ import (
 	"github.com/art-sitedesign/sitorama/app/handlers"
 )
 
+//todo: запилить нормальные ошибки и логирование
+//todo: годоки дописать
+//todo: конструктор приложения
+
 func main() {
-	tmpl := template.Must(template.ParseFiles("app/templates/index.html", "app/templates/test.html"))
+	tmpl := template.Must(template.ParseFiles("app/templates/html/index.html"))
 
 	http.HandleFunc("/", handlers.Index(tmpl))
 	http.HandleFunc("/init", handlers.Init(tmpl))
