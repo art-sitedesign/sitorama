@@ -1,4 +1,4 @@
-package core
+package services
 
 import (
 	"context"
@@ -12,10 +12,17 @@ import (
 	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
-const RouterName = "router"
+type Router struct {
+	docker *docker.Docker
+}
 
-func (c *Core) findRouter(ctx context.Context) (*types.Container, error) {
-	containers, err := c.docker.FindContainers(ctx, RouterName)
+func NewRouter(d *docker.Docker) Service {
+	return &Router{docker: d}
+}
+
+// Find найдет контейнер роутера
+func (r *Router) Find(ctx context.Context) (*types.Container, error) {
+	containers, err := r.docker.FindContainers(ctx, utils.RouterName)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed get router")
 	}
@@ -27,7 +34,8 @@ func (c *Core) findRouter(ctx context.Context) (*types.Container, error) {
 	return &containers[0], nil
 }
 
-func (c *Core) createRouter(ctx context.Context) (string, error) {
+// Create создаст контейнер роутера
+func (r *Router) Create(ctx context.Context) (string, error) {
 	portSet, portMap := docker.BindPorts(map[string]string{"80": "80"})
 
 	config := docker.DefaultContainerConfig()
@@ -50,5 +58,5 @@ func (c *Core) createRouter(ctx context.Context) (string, error) {
 	volumes := docker.MakeVolumes(map[string]string{path: "/etc/nginx/conf.d/"})
 	hostConfig.Mounts = volumes
 
-	return c.docker.CreateContainer(ctx, RouterName, config, hostConfig)
+	return r.docker.CreateContainer(ctx, utils.RouterName, config, hostConfig)
 }

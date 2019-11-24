@@ -2,6 +2,9 @@ package core
 
 import (
 	"context"
+
+	"github.com/art-sitedesign/sitorama/app/core/services"
+	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
 // Init произведет инициализацию приложения, запустив нужные контейнеры
@@ -19,7 +22,7 @@ func (c *Core) Init(ctx context.Context) error {
 	}
 
 	// подключение контейнера-роутера к подсети приложения
-	err = c.docker.ConnectNetwork(ctx, networkID, containerID, []string{RouterName})
+	err = c.docker.ConnectNetwork(ctx, networkID, containerID, []string{utils.RouterName})
 	if err != nil {
 		return err
 	}
@@ -54,13 +57,15 @@ func (c *Core) initNetwork(ctx context.Context) (string, error) {
 }
 
 func (c *Core) initRouter(ctx context.Context) (string, error) {
-	res, err := c.findRouter(ctx)
+	router := services.NewRouter(c.docker)
+
+	res, err := router.Find(ctx)
 	if err != nil {
 		return "", err
 	}
 
 	if res == nil {
-		cID, err := c.createRouter(ctx)
+		cID, err := router.Create(ctx)
 		if err != nil {
 			return "", err
 		}
