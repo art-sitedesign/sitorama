@@ -12,6 +12,7 @@ import (
 //todo: запилить нормальные ошибки и логирование
 //todo: годоки дописать
 //todo: конструктор приложения
+//todo: логи сервисов прокидывать наружу или в stdout?
 
 func main() {
 	tmpl := template.Must(template.ParseFiles("app/templates/html/index.html"))

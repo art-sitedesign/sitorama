@@ -56,3 +56,7 @@ func (sp *SitePHPFPM) Create(ctx context.Context) (string, error) {
 func (sp *SitePHPFPM) ContainerName() string {
 	return utils.ContainerName(fmt.Sprintf("%s_php-fpm", sp.name))
 }
+
+func (sp *SitePHPFPM) State(ctx context.Context) *ServiceState {
+	return &ServiceState{}
+}
