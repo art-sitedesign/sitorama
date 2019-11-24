@@ -49,23 +49,27 @@
             <td>Действия</td>
         </tr>
         {{range .State.Services}}
-        <tr>
-            <td>{{.ID}}</td>
-            <td>{{.Name}}</td>
-            <td>
-                {{if .Active}}
-                    Активный
-                {{else}}
-                    Неактивный
-                {{end}}
-            </td>
-            <td>{{.CreateTime}}</td>
-            <td>
-                <button>Перезапустить</button>
-                <button>Остановить</button>
-                <button>Удалить</button>
-            </td>
-        </tr>
+            <tr>
+                <td>{{.ID}}</td>
+                <td>{{.Name}}</td>
+                <td>
+                    {{if .Active}}
+                        Активный
+                    {{else}}
+                        Неактивный
+                    {{end}}
+                </td>
+                <td>{{.CreateTime}}</td>
+                <td>
+                    <a href="/container/restart?cid={{.ID}}">Перезапустить</a>
+                    {{if .Active}}
+                        <a href="/container/stop?cid={{.ID}}">Остановить</a>
+                    {{else if .CanStart}}
+                        <a href="/container/start?cid={{.ID}}">Запустить</a>
+                    {{end}}
+                    <button>Удалить</button>
+                </td>
+            </tr>
         {{end}}
     </table>
 </div>

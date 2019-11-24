@@ -74,6 +74,11 @@ func (d *Docker) RestartContainer(ctx context.Context, containerID string) error
 	return d.client.ContainerRestart(ctx, containerID, nil)
 }
 
+// StopContainer остановит контейнер
+func (d *Docker) StopContainer(ctx context.Context, containerID string) error {
+	return d.client.ContainerStop(ctx, containerID, nil)
+}
+
 // CopyToContainer скопирует данные в файловую систему контейнера
 func (d *Docker) CopyToContainer(ctx context.Context, containerID string, path string, fileName string, data *bytes.Buffer) error {
 	var buf bytes.Buffer

@@ -12,6 +12,10 @@ type State struct {
 	CreateTime time.Time
 }
 
+func (s *State) CanStart() bool {
+	return s.Active == false && s.ID != ""
+}
+
 // ServiceState вернет состояние сервиса
 func ServiceState(ctx context.Context, service Service) *State {
 	container, err := service.Find(ctx)

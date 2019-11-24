@@ -21,6 +21,11 @@ func main() {
 	http.HandleFunc("/init", handlers.Init(tmpl))
 	http.HandleFunc("/create", handlers.Create(tmpl))
 
+	// экшены контейнеров
+	http.HandleFunc("/container/restart", handlers.ContainerRestart(tmpl))
+	http.HandleFunc("/container/stop", handlers.ContainerStop(tmpl))
+	http.HandleFunc("/container/start", handlers.ContainerStart(tmpl))
+
 	fmt.Println("Open GUI: http://127.0.0.1:8085")
 	err := http.ListenAndServe(":8085", nil)
 	if err != nil {
