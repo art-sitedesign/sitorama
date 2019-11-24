@@ -13,6 +13,7 @@ import (
 //todo: годоки дописать
 //todo: конструктор приложения
 //todo: логи сервисов прокидывать наружу или в stdout?
+//todo: дождаться выполнения контейнера
 
 func main() {
 	tmpl := template.Must(template.ParseFiles(
@@ -25,6 +26,9 @@ func main() {
 	http.HandleFunc("/create", handlers.Create(tmpl))
 
 	http.HandleFunc("/create/save", handlers.CreateSave(tmpl))
+
+	// экшены проектов
+	http.HandleFunc("/project/stop", handlers.ProjectStop(tmpl))
 
 	// экшены контейнеров
 	http.HandleFunc("/container/restart", handlers.ContainerRestart(tmpl))

@@ -5,6 +5,7 @@ import (
 
 	"github.com/docker/docker/api/types"
 
+	"github.com/art-sitedesign/sitorama/app/core/project"
 	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
@@ -21,4 +22,10 @@ func (c *Core) FindProjects(ctx context.Context) (map[string][]types.Container, 
 	}
 
 	return result, nil
+}
+
+func (c *Core) StopProject(ctx context.Context, name string) error {
+	pr := project.NewProject(c.docker)
+
+	return pr.Stop(ctx, name)
 }
