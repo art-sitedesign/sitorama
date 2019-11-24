@@ -22,7 +22,7 @@ func NewRouter(d *docker.Docker) Service {
 
 // Find найдет контейнер роутера
 func (r *Router) Find(ctx context.Context) (*types.Container, error) {
-	containers, err := r.docker.FindContainers(ctx, utils.RouterName)
+	containers, err := r.docker.FindContainers(ctx, r.ContainerName())
 	if err != nil {
 		return nil, errors.Wrap(err, "failed get router")
 	}
@@ -58,5 +58,9 @@ func (r *Router) Create(ctx context.Context) (string, error) {
 	volumes := docker.MakeVolumes(map[string]string{path: "/etc/nginx/conf.d/"})
 	hostConfig.Mounts = volumes
 
-	return r.docker.CreateContainer(ctx, utils.RouterName, config, hostConfig)
+	return r.docker.CreateContainer(ctx, r.ContainerName(), config, hostConfig)
+}
+
+func (r *Router) ContainerName() string {
+	return utils.RouterName
 }

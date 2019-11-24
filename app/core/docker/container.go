@@ -1,9 +1,10 @@
 package docker
 
 import (
+	"archive/tar"
+	"bytes"
 	"context"
 	"fmt"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
@@ -15,6 +16,18 @@ import (
 // CreateContainer создаст контейнер
 func (d *Docker) CreateContainer(ctx context.Context, name string, config *container.Config, hostConfig *container.HostConfig) (string, error) {
 	networkingConfig := &network.NetworkingConfig{}
+
+	images, err := d.FindImage(ctx, config.Image)
+	if err != nil {
+		return "", nil
+	}
+
+	if len(images) == 0 {
+		err = d.PullImage(ctx, config.Image)
+		if err != nil {
+			return "", err
+		}
+	}
 
 	res, err := d.client.ContainerCreate(ctx, config, hostConfig, networkingConfig, utils.ContainerName(name))
 	if err != nil {
@@ -35,7 +48,7 @@ func (d *Docker) FindContainers(ctx context.Context, name string) ([]types.Conta
 	opts := types.ContainerListOptions{
 		Quiet:   false,
 		Size:    false,
-		All:     false,
+		All:     true,
 		Latest:  false,
 		Since:   "",
 		Before:  "",
@@ -59,4 +72,33 @@ func (d *Docker) StartContainer(ctx context.Context, containerID string) error {
 // RestartContainer перезапустит контейнер
 func (d *Docker) RestartContainer(ctx context.Context, containerID string) error {
 	return d.client.ContainerRestart(ctx, containerID, nil)
+}
+
+// CopyToContainer скопирует данные в файловую систему контейнера
+func (d *Docker) CopyToContainer(ctx context.Context, containerID string, path string, fileName string, data *bytes.Buffer) error {
+	var buf bytes.Buffer
+	tw := tar.NewWriter(&buf)
+
+	hdr := &tar.Header{
+		Name: fileName,
+		Mode: 0755,
+		Size: int64(data.Len()),
+	}
+	if err := tw.WriteHeader(hdr); err != nil {
+		return err
+	}
+
+	if _, err := tw.Write(data.Bytes()); err != nil {
+		return err
+	}
+
+	if err := tw.Close(); err != nil {
+		return err
+	}
+
+	options := types.CopyToContainerOptions{
+		AllowOverwriteDirWithFile: false,
+	}
+
+	return d.client.CopyToContainer(ctx, containerID, path, &buf, options)
 }

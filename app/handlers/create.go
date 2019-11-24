@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"html/template"
 	"log"
 	"net/http"
@@ -15,7 +16,7 @@ func Create(tmpl *template.Template) Handler {
 			log.Fatalf("error: %v", err)
 		}
 
-		err = cr.CreateSite("test.loc")
+		err = cr.CreateSite(context.Background(), "test.loc")
 		if err != nil {
 			log.Fatalf("error: %v", err)
 		}
