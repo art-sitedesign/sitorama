@@ -98,6 +98,7 @@ func createRouterConfig(name string, containerAlias string) error {
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 
 	data := map[string]string{
 		"Domain":         name,

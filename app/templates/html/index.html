@@ -9,6 +9,15 @@
 <h2>сервис для локального деплоя веб-приложений на основе docker</h2>
 
 <div>
+    {{if .AppSettings.ProjectsRoot}}
+        <h4>Корневая директория проектов: {{.AppSettings.ProjectsRoot}} <a href="/settings/app">Настройки</a></h4>
+    {{else}}
+        <h4>НАДО ЗАПОЛНИТЬ КОРЕНЬ ПРОЕКТОВ: <a href="/settings/app">Настройки</a></h4>
+    {{end}}
+</div>
+
+</h4>
+<div>
     <h3>Состояние роутера:</h3>
     <table>
         <tr>
