@@ -28,6 +28,7 @@ func main() {
 	http.HandleFunc("/create/save", handlers.CreateSave(tmpl))
 
 	// экшены проектов
+	http.HandleFunc("/project/start", handlers.ProjectStart(tmpl))
 	http.HandleFunc("/project/stop", handlers.ProjectStop(tmpl))
 
 	// экшены контейнеров

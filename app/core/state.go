@@ -3,13 +3,14 @@ package core
 import (
 	"context"
 
+	"github.com/art-sitedesign/sitorama/app/core/project"
 	"github.com/art-sitedesign/sitorama/app/core/services"
 	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
 type AppState struct {
 	Router   *services.State
-	Projects map[string][]*services.State
+	Projects []*project.State
 }
 
 func (c *Core) State(ctx context.Context) (*AppState, error) {
@@ -18,21 +19,18 @@ func (c *Core) State(ctx context.Context) (*AppState, error) {
 	rContainer, err := router.Find(ctx)
 	rState := services.ContainerState(rContainer, utils.RouterName)
 
-	projectContainers, err := c.FindProjects(ctx)
+	prContainers, err := c.FindProjects(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	projects := make(map[string][]*services.State)
-
-	for projectName, cns := range projectContainers {
-		if projectName == utils.RouterName {
+	projects := make([]*project.State, 0, len(prContainers))
+	for prName, prConts := range prContainers {
+		if prName == utils.RouterName {
 			continue
 		}
 
-		for _, container := range cns {
-			projects[projectName] = append(projects[projectName], services.ContainerState(&container, projectName))
-		}
+		projects = append(projects, project.ProjectState(prName, prConts))
 	}
 
 	return &AppState{

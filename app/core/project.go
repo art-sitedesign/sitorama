@@ -24,6 +24,12 @@ func (c *Core) FindProjects(ctx context.Context) (map[string][]types.Container, 
 	return result, nil
 }
 
+func (c *Core) StartProject(ctx context.Context, name string) error {
+	pr := project.NewProject(c.docker)
+
+	return pr.Start(ctx, name)
+}
+
 func (c *Core) StopProject(ctx context.Context, name string) error {
 	pr := project.NewProject(c.docker)
 

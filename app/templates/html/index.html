@@ -48,13 +48,18 @@
 
 <div>
     <h3>Состояние проектов:</h3>
-    {{range $ProjectName, $Containers := .State.Projects}}
+    {{range .State.Projects}}
         <table>
             <tr>
-                <td><h4>{{$ProjectName}}</h4></td>
-                <td><a href="/project/stop?name={{$ProjectName}}">Остановить</a></td>
-                <td><a href="/project/start?name={{$ProjectName}}">Запустить</a></td>
-                <td><a href="/project/remove?name={{$ProjectName}}">Удалить</a></td>
+                <td><h4>{{.Name}}</h4></td>
+                {{if .Active}}
+                    <td>Активный</td>
+                    <td><a href="/project/stop?name={{.Name}}">Остановить</a></td>
+                {{else}}
+                    <td>Неактивный</td>
+                    <td><a href="/project/start?name={{.Name}}">Запустить</a></td>
+                    <td><a href="/project/remove?name={{.Name}}">Удалить</a></td>
+                {{end}}
             </tr>
         </table>
         <table>
@@ -65,7 +70,7 @@
                 <td>Время создания</td>
                 <td>Действия</td>
             </tr>
-            {{range $Containers}}
+            {{range .Services}}
                 <tr>
                     <td>{{.ID}}</td>
                     <td>{{.ServiceName}}</td>
