@@ -28,7 +28,7 @@ func CreateSave(tmpl *template.Template) Handler {
 			log.Fatalf("error: %v", err)
 		}
 
-		err = cr.CreateSite(context.Background(), name)
+		err = cr.CreateProject(context.Background(), name)
 		if err != nil {
 			log.Fatalf("error: %v", err)
 		}

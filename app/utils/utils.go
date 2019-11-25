@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"strings"
 	"text/template"
 
@@ -42,4 +43,32 @@ func ProjectNameFromContainer(c *types.Container) string {
 	}
 
 	return strings.Join(sp, "_")
+}
+
+// CreateRouterConfig создаст новый конфиг файл для роутера
+func CreateRouterConfig(name string, containerAlias string) error {
+	tmpl := template.Must(template.ParseFiles(RouterConfTemplate))
+
+	err := os.MkdirAll(RouterConfDir, 0755)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Create(RouterConfPath(name))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	data := map[string]string{
+		"Domain":         name,
+		"ContainerAlias": containerAlias,
+	}
+
+	err = tmpl.Execute(f, data)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
