@@ -35,3 +35,9 @@ func (c *Core) StopProject(ctx context.Context, name string) error {
 
 	return pr.Stop(ctx, name)
 }
+
+func (c *Core) RemoveProject(ctx context.Context, name string) error {
+	pr := project.NewProject(c.docker)
+
+	return pr.Remove(ctx, name)
+}

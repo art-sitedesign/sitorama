@@ -30,6 +30,7 @@ func main() {
 	// экшены проектов
 	http.HandleFunc("/project/start", handlers.ProjectStart(tmpl))
 	http.HandleFunc("/project/stop", handlers.ProjectStop(tmpl))
+	http.HandleFunc("/project/remove", handlers.ProjectRemove(tmpl))
 
 	// экшены контейнеров
 	http.HandleFunc("/container/restart", handlers.ContainerRestart(tmpl))
