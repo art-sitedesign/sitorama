@@ -10,6 +10,7 @@ import (
 	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
+// FindProjects найдет контейнеры проектов в вернёт их сгруппированными по проекту
 func (c *Core) FindProjects(ctx context.Context) (map[string][]types.Container, error) {
 	containers, err := c.docker.FindContainers(ctx, "")
 	if err != nil {
@@ -25,6 +26,7 @@ func (c *Core) FindProjects(ctx context.Context) (map[string][]types.Container, 
 	return result, nil
 }
 
+// CreateProject создаст проект
 func (c *Core) CreateProject(ctx context.Context, name string) error {
 	pr := project.NewProject(c.docker)
 
@@ -34,23 +36,46 @@ func (c *Core) CreateProject(ctx context.Context, name string) error {
 	nginxPHPFPM := builder.NewNginxPHPFPM(c.docker, name)
 	builders = append(builders, nginxPHPFPM)
 
-	return pr.Create(ctx, builders)
+	err := pr.Create(ctx, builders)
+	if err != nil {
+		return err
+	}
+
+	err = utils.AddHost(name)
+	if err != nil {
+		return ErrorCantChangeHosts
+	}
+
+	return nil
 }
 
+// StartProject запустит контейнеры проекта
 func (c *Core) StartProject(ctx context.Context, name string) error {
 	pr := project.NewProject(c.docker)
 
 	return pr.Start(ctx, name)
 }
 
+// StopProject остановит контейнеры проекта
 func (c *Core) StopProject(ctx context.Context, name string) error {
 	pr := project.NewProject(c.docker)
 
 	return pr.Stop(ctx, name)
 }
 
+// RemoveProject удалит проект
 func (c *Core) RemoveProject(ctx context.Context, name string) error {
 	pr := project.NewProject(c.docker)
 
-	return pr.Remove(ctx, name)
+	err := pr.Remove(ctx, name)
+	if err != nil {
+		return err
+	}
+
+	err = utils.RemoveHost(name)
+	if err != nil {
+		return ErrorCantChangeHosts
+	}
+
+	return nil
 }

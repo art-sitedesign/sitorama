@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"os/exec"
+	"runtime"
 	"strings"
 	"text/template"
 
@@ -71,4 +73,31 @@ func CreateRouterConfig(name string, containerAlias string) error {
 	}
 
 	return nil
+}
+
+// AddHost добавит домен для локального хоста
+func AddHost(name string) error {
+	build := "linux"
+	if isDarwin() {
+		build = "mac"
+	}
+
+	cmd := exec.Command("make", "hm.add", "E="+build, "D="+name)
+	return cmd.Run()
+}
+
+// RemoveHost удалит домен для локального хоста
+func RemoveHost(name string) error {
+	build := "linux"
+	if isDarwin() {
+		build = "mac"
+	}
+
+	cmd := exec.Command("make", "hm.rm", "E="+build, "D="+name)
+	return cmd.Run()
+}
+
+// isDarwin вернет тип ОС. Костыль. Временно. Пока не хочу заморачиваться с нормальным сборщиком под ОС
+func isDarwin() bool {
+	return runtime.GOOS == "darwin"
 }
