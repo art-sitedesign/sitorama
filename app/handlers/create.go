@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"html/template"
-	"log"
 	"net/http"
 
 	"github.com/art-sitedesign/sitorama/app/core"
@@ -16,12 +15,14 @@ func Create(tmpl *template.Template) Handler {
 
 			cr, err := core.NewCore()
 			if err != nil {
-				log.Fatalf("error: %v", err)
+				writeErr(tmpl, w, err)
+				return
 			}
 
 			err = cr.CreateProject(context.Background(), name)
 			if err != nil {
-				log.Fatalf("error: %v", err)
+				writeErr(tmpl, w, err)
+				return
 			}
 
 			http.Redirect(w, r, "/", 302)
@@ -31,7 +32,8 @@ func Create(tmpl *template.Template) Handler {
 		data := struct{}{}
 		err := tmpl.ExecuteTemplate(w, "create.html", data)
 		if err != nil {
-			_, _ = w.Write([]byte("Error: " + err.Error()))
+			writeErr(tmpl, w, err)
+			return
 		}
 	}
 }

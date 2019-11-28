@@ -9,7 +9,6 @@ import (
 	"github.com/art-sitedesign/sitorama/app/handlers"
 )
 
-//todo: запилить нормальные ошибки и логирование
 //todo: годоки дописать
 //todo: конструктор приложения
 //todo: логи сервисов прокидывать наружу или в stdout?
@@ -19,6 +18,7 @@ func main() {
 	tmpl := template.Must(template.ParseFiles(
 		"app/templates/html/index.html",
 		"app/templates/html/create.html",
+		"app/templates/html/error.html",
 	))
 
 	http.HandleFunc("/", handlers.Index(tmpl))
