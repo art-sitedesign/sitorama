@@ -23,11 +23,9 @@ func main() {
 
 	http.HandleFunc("/", handlers.Index(tmpl))
 	http.HandleFunc("/init", handlers.Init(tmpl))
-	http.HandleFunc("/create", handlers.Create(tmpl))
-
-	http.HandleFunc("/create/save", handlers.CreateSave(tmpl))
 
 	// экшены проектов
+	http.HandleFunc("/project/create", handlers.Create(tmpl))
 	http.HandleFunc("/project/start", handlers.ProjectStart(tmpl))
 	http.HandleFunc("/project/stop", handlers.ProjectStop(tmpl))
 	http.HandleFunc("/project/remove", handlers.ProjectRemove(tmpl))
