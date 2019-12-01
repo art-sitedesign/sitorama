@@ -29,7 +29,7 @@ func (c *Core) CreateBuilders(model *models.ProjectCreate) []builder.Builder {
 func (c *Core) createWebServer(model *models.ProjectCreate) builder.Builder {
 	switch model.WebServer {
 	case builder.BuilderNginxPHPFPM:
-		return builder.NewNginxPHPFPM(c.docker, model.Domain)
+		return builder.NewNginxPHPFPM(c.docker, model.Domain, model.EntryPoint)
 	case builder.BuilderApache:
 		return nil
 	default:

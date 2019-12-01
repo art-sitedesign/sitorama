@@ -15,15 +15,17 @@ const (
 )
 
 type NginxPHPFPM struct {
-	docker *docker.Docker
-	name   string
-	config Config
+	docker     *docker.Docker
+	name       string
+	entryPoint string
+	config     Config
 }
 
-func NewNginxPHPFPM(d *docker.Docker, n string) Builder {
+func NewNginxPHPFPM(d *docker.Docker, n string, ep string) Builder {
 	return &NginxPHPFPM{
-		docker: d,
-		name:   n,
+		docker:     d,
+		name:       n,
+		entryPoint: ep,
 	}
 }
 
@@ -152,7 +154,7 @@ func (np *NginxPHPFPM) buildNginx(ctx context.Context, networkID string) error {
 		nConfP = nil
 	}
 
-	siteNginx := services.NewSiteNginx(np.docker, np.name, pfAlias, nConfP)
+	siteNginx := services.NewSiteNginx(np.docker, np.name, np.entryPoint, pfAlias, nConfP)
 	container, err := siteNginx.Find(ctx)
 	if err != nil {
 		return err
@@ -183,7 +185,7 @@ func (np *NginxPHPFPM) buildNginx(ctx context.Context, networkID string) error {
 
 func (np *NginxPHPFPM) nginxConfig() (string, error) {
 	_, pfAlias := np.aliases()
-	siteNginx := services.NewSiteNginx(np.docker, np.name, pfAlias, nil)
+	siteNginx := services.NewSiteNginx(np.docker, np.name, np.entryPoint, pfAlias, nil)
 	nConf, err := siteNginx.RenderConfig()
 	if err != nil {
 		return "", err

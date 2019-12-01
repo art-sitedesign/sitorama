@@ -79,7 +79,7 @@ func CreateRouterConfig(name string, containerAlias string) error {
 func AddHost(name string) error {
 	build := "linux"
 	if isDarwin() {
-		build = "mac"
+		build = "macos"
 	}
 
 	cmd := exec.Command("make", "hm.add", "E="+build, "D="+name)

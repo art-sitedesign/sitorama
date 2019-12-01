@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/art-sitedesign/sitorama/app/core"
 	"github.com/art-sitedesign/sitorama/app/core/builder"
@@ -16,7 +17,7 @@ func ProjectCreate(tmpl *template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == "POST" {
 			d := r.PostFormValue("domain")
-			ep := r.PostFormValue("entryPoint")
+			ep := strings.TrimLeft(r.PostFormValue("entryPoint"), "/")
 			ws, _ := strconv.Atoi(r.PostFormValue("webServer"))
 			db, _ := strconv.Atoi(r.PostFormValue("database"))
 			c, _ := strconv.Atoi(r.PostFormValue("cache"))

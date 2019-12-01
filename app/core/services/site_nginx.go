@@ -13,18 +13,20 @@ import (
 )
 
 type SiteNginx struct {
-	docker  *docker.Docker
-	name    string
-	pfAlias string
-	config  *string
+	docker     *docker.Docker
+	name       string
+	entryPoint string
+	pfAlias    string
+	config     *string
 }
 
-func NewSiteNginx(d *docker.Docker, n string, pfAlias string, config *string) *SiteNginx {
+func NewSiteNginx(d *docker.Docker, n string, ep string, pfAlias string, cf *string) *SiteNginx {
 	return &SiteNginx{
-		docker:  d,
-		name:    n,
-		pfAlias: pfAlias,
-		config:  config,
+		docker:     d,
+		name:       n,
+		entryPoint: ep,
+		pfAlias:    pfAlias,
+		config:     cf,
 	}
 }
 
@@ -89,7 +91,7 @@ func (sn *SiteNginx) Create(ctx context.Context) (string, error) {
 }
 
 func (sn *SiteNginx) RenderConfig() (*bytes.Buffer, error) {
-	params := map[string]string{"Domain": sn.name, "PFAlias": sn.pfAlias}
+	params := map[string]string{"Domain": sn.name, "EntryPoint": sn.entryPoint, "PFAlias": sn.pfAlias}
 	return utils.RenderTemplateInBuffer(utils.SiteNginxServerTemplate, params)
 }
 
