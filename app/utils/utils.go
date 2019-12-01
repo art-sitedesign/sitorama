@@ -90,7 +90,7 @@ func AddHost(name string) error {
 func RemoveHost(name string) error {
 	build := "linux"
 	if isDarwin() {
-		build = "mac"
+		build = "macos"
 	}
 
 	cmd := exec.Command("make", "hm.rm", "E="+build, "D="+name)
