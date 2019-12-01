@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sitorama</title>
+    <style>
+        textarea {
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+</head>
+<body>
+<h1>Подтверждение создания проекта</h1>
+
+<form action="/project/create-confirm" method="post">
+    <div>
+        <h3>Домен</h3>
+        <span>{{.Model.Domain}}</span>
+    </div>
+    <div>
+        <h3>Точка входа</h3>
+        <span>{{.Model.EntryPoint}}</span>
+    </div>
+    <div>
+        <h3>Конфиги</h3>
+        {{range $name, $configs := .Config}}
+            <div>
+                <h4>{{$name}}</h4>
+                {{range $configName, $configVal := $configs}}
+                    <div>
+                        <h5>{{$configName}}</h5>
+                        <textarea name="config[{{$name}}][{{$configName}}]">{{$configVal}}</textarea>
+                    </div>
+                {{end}}
+            </div>
+        {{end}}
+    </div>
+
+    <input type="hidden" name="model[domain]" value="{{.Model.Domain}}">
+    <input type="hidden" name="model[entryPoint]" value="{{.Model.EntryPoint}}">
+    <input type="hidden" name="model[webServer]" value="{{.Model.WebServer}}">
+    <input type="hidden" name="model[database]" value="{{.Model.Database}}">
+    <input type="hidden" name="model[cache]" value="{{.Model.Cache}}">
+
+    <button type="submit">Подтвердить создание</button>
+</form>
+</body>
+</html>

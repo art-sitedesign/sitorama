@@ -7,6 +7,7 @@ import (
 
 	"github.com/art-sitedesign/sitorama/app/core/builder"
 	"github.com/art-sitedesign/sitorama/app/core/project"
+	"github.com/art-sitedesign/sitorama/app/models"
 	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
@@ -27,21 +28,15 @@ func (c *Core) FindProjects(ctx context.Context) (map[string][]types.Container, 
 }
 
 // CreateProject создаст проект
-func (c *Core) CreateProject(ctx context.Context, name string) error {
+func (c *Core) CreateProject(ctx context.Context, model *models.ProjectCreate, builders []builder.Builder) error {
 	pr := project.NewProject(c.docker)
-
-	//todo: понять какие билдеры нужны...
-	builders := make([]builder.Builder, 0, 1)
-
-	nginxPHPFPM := builder.NewNginxPHPFPM(c.docker, name)
-	builders = append(builders, nginxPHPFPM)
 
 	err := pr.Create(ctx, builders)
 	if err != nil {
 		return err
 	}
 
-	err = utils.AddHost(name)
+	err = utils.AddHost(model.Domain)
 	if err != nil {
 		return ErrorCantChangeHosts
 	}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sitorama</title>
+    <style>
+        input[type=text] {
+            padding: 5px;
+            width: 500px;
+        }
+        .create-builder {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .create-builder__item {
+            margin-right: 15px;
+        }
+
+        .create-builder__item label {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<h2>Создание проекта</h2>
+<h4>
+    Внимание: при создании проекта для добавления в файл /etc/hosts домена проекта
+    может потребоваться суперпользователь (sudo).
+    После отправки формы нужно обратить внимание на терминал в котором запущено приложение.
+</h4>
+<form method="post">
+    <h3>Название:</h3>
+    <input type="text" name="domain" required placeholder="Домаен в зоне .loc, например: example.loc">
+    <hr>
+
+    <h3>Директория точи входа:</h3>
+    <input type="text" name="entryPoint" required placeholder="Относительно корня данного проекта, например: / или /app">
+    <hr>
+
+    <div class="create-builder">
+        <div class="create-builder__item">
+            <h3>Вебсервер:</h3>
+            <label>
+                <input type="radio" name="webServer" value="0" checked>
+                <span>Не требуется</span>
+            </label>
+            {{ range $val, $title := .WebserverBuilders}}
+                <label>
+                    <input type="radio" name="webServer" value="{{$val}}">
+                    <span>{{$title}}</span>
+                </label>
+            {{ end }}
+        </div>
+
+        <div class="create-builder__item">
+            <h3>База данных:</h3>
+            <label>
+                <input type="radio" name="database" value="0" checked>
+                <span>Не требуется</span>
+            </label>
+            {{ range $val, $title := .DatabaseBuilders}}
+                <label>
+                    <input type="radio" name="database" value="{{$val}}">
+                    <span>{{$title}}</span>
+                </label>
+            {{ end }}
+        </div>
+
+        <div class="create-builder__item">
+            <h3>Кэш:</h3>
+            <label>
+                <input type="radio" name="cache" value="0" checked>
+                <span>Не требуется</span>
+            </label>
+            {{ range $val, $title := .CacheBuilders}}
+                <label>
+                    <input type="radio" name="cache" value="{{$val}}">
+                    <span>{{$title}}</span>
+                </label>
+            {{ end }}
+        </div>
+    </div>
+
+    <hr>
+
+    <button type="submit">Создать</button>
+</form>
+</body>
+</html>

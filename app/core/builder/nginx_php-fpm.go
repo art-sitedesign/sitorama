@@ -2,6 +2,7 @@ package builder
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/art-sitedesign/sitorama/app/core/docker"
@@ -9,9 +10,14 @@ import (
 	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
+const (
+	NginxPHPFPMConfigNginx = "nginx-config"
+)
+
 type NginxPHPFPM struct {
 	docker *docker.Docker
 	name   string
+	config Config
 }
 
 func NewNginxPHPFPM(d *docker.Docker, n string) Builder {
@@ -21,9 +27,49 @@ func NewNginxPHPFPM(d *docker.Docker, n string) Builder {
 	}
 }
 
+func (np *NginxPHPFPM) Name() string {
+	return "Nginx+PHP-FPM"
+}
+
+func (np *NginxPHPFPM) ConfigNames() []string {
+	return []string{
+		NginxPHPFPMConfigNginx,
+	}
+}
+
+func (np *NginxPHPFPM) ConfigByName(name string) (string, error) {
+	switch name {
+	case NginxPHPFPMConfigNginx:
+		nConf, err := np.nginxConfig()
+		if err != nil {
+			return "", err
+		}
+		return nConf, nil
+	default:
+		return "", errors.New("unknown config " + name)
+	}
+}
+
+func (np *NginxPHPFPM) PrepareConfig() (Config, error) {
+	conf := Config{}
+
+	for _, name := range np.ConfigNames() {
+		c, err := np.ConfigByName(name)
+		if err != nil {
+			return nil, err
+		}
+		conf[name] = c
+	}
+
+	return conf, nil
+}
+
+func (np *NginxPHPFPM) SetConfig(config Config) {
+	np.config = config
+}
+
 func (np *NginxPHPFPM) Build(ctx context.Context) error {
-	pfAlias := fmt.Sprintf("%s.phpfpm", np.name)
-	ngAlias := fmt.Sprintf("%s.nginx", np.name)
+	ngAlias, _ := np.aliases()
 
 	// создание конфиг-фалйа для роутера
 	err := utils.CreateRouterConfig(np.name, ngAlias)
@@ -38,12 +84,12 @@ func (np *NginxPHPFPM) Build(ctx context.Context) error {
 	}
 
 	// сборка контейнера PHP-FPM
-	err = np.buildPHPFPM(ctx, network.ID, pfAlias)
+	err = np.buildPHPFPM(ctx, network.ID)
 	if err != nil {
 		return err
 	}
 
-	err = np.buildNginx(ctx, network.ID, pfAlias, ngAlias)
+	err = np.buildNginx(ctx, network.ID)
 	if err != nil {
 		return err
 	}
@@ -63,7 +109,8 @@ func (np *NginxPHPFPM) Build(ctx context.Context) error {
 	return nil
 }
 
-func (np *NginxPHPFPM) buildPHPFPM(ctx context.Context, networkID string, pfAlias string) error {
+func (np *NginxPHPFPM) buildPHPFPM(ctx context.Context, networkID string) error {
+	_, pfAlias := np.aliases()
 	// поиск PHP-FPM контейнера
 	sitePHPFPM := services.NewSitePHPFPM(np.docker, np.name)
 	pfContainer, err := sitePHPFPM.Find(ctx)
@@ -94,8 +141,18 @@ func (np *NginxPHPFPM) buildPHPFPM(ctx context.Context, networkID string, pfAlia
 	return nil
 }
 
-func (np *NginxPHPFPM) buildNginx(ctx context.Context, networkID string, pfAlias string, ngAlias string) error {
-	siteNginx := services.NewSiteNginx(np.docker, np.name, pfAlias)
+func (np *NginxPHPFPM) buildNginx(ctx context.Context, networkID string) error {
+	ngAlias, pfAlias := np.aliases()
+
+	var nConfP *string
+	nConf, ok := np.config[NginxPHPFPMConfigNginx]
+	if ok {
+		nConfP = &nConf
+	} else {
+		nConfP = nil
+	}
+
+	siteNginx := services.NewSiteNginx(np.docker, np.name, pfAlias, nConfP)
 	container, err := siteNginx.Find(ctx)
 	if err != nil {
 		return err
@@ -122,4 +179,22 @@ func (np *NginxPHPFPM) buildNginx(ctx context.Context, networkID string, pfAlias
 	}
 
 	return nil
+}
+
+func (np *NginxPHPFPM) nginxConfig() (string, error) {
+	_, pfAlias := np.aliases()
+	siteNginx := services.NewSiteNginx(np.docker, np.name, pfAlias, nil)
+	nConf, err := siteNginx.RenderConfig()
+	if err != nil {
+		return "", err
+	}
+
+	return nConf.String(), nil
+}
+
+func (np *NginxPHPFPM) aliases() (string, string) {
+	pfAlias := fmt.Sprintf("%s.phpfpm", np.name)
+	ngAlias := fmt.Sprintf("%s.nginx", np.name)
+
+	return ngAlias, pfAlias
 }

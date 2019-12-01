@@ -7,8 +7,8 @@ import (
 )
 
 func (p *Project) Create(ctx context.Context, builders []builder.Builder) error {
-	for _, bldr := range builders {
-		err := bldr.Build(ctx)
+	for _, b := range builders {
+		err := b.Build(ctx)
 		if err != nil {
 			return err
 		}

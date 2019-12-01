@@ -17,7 +17,8 @@ import (
 func main() {
 	tmpl := template.Must(template.ParseFiles(
 		"app/templates/html/index.html",
-		"app/templates/html/create.html",
+		"app/templates/html/project/create.html",
+		"app/templates/html/project/confirm.html",
 		"app/templates/html/settings-app.html",
 		"app/templates/html/error.html",
 	))
@@ -29,7 +30,8 @@ func main() {
 	http.HandleFunc("/settings/app", handlers.SettingsApp(tmpl))
 
 	// экшены проектов
-	http.HandleFunc("/project/create", handlers.Create(tmpl))
+	http.HandleFunc("/project/create", handlers.ProjectCreate(tmpl))
+	http.HandleFunc("/project/create-confirm", handlers.ProjectCreateConfirm(tmpl))
 	http.HandleFunc("/project/start", handlers.ProjectStart(tmpl))
 	http.HandleFunc("/project/stop", handlers.ProjectStop(tmpl))
 	http.HandleFunc("/project/remove", handlers.ProjectRemove(tmpl))

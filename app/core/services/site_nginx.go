@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 
@@ -15,13 +16,15 @@ type SiteNginx struct {
 	docker  *docker.Docker
 	name    string
 	pfAlias string
+	config  *string
 }
 
-func NewSiteNginx(d *docker.Docker, n string, pfAlias string) *SiteNginx {
+func NewSiteNginx(d *docker.Docker, n string, pfAlias string, config *string) *SiteNginx {
 	return &SiteNginx{
 		docker:  d,
 		name:    n,
 		pfAlias: pfAlias,
+		config:  config,
 	}
 }
 
@@ -57,8 +60,20 @@ func (sn *SiteNginx) Create(ctx context.Context) (string, error) {
 		return "", err
 	}
 
-	params := map[string]string{"Domain": sn.name, "PFAlias": sn.pfAlias}
-	serverConf, err := utils.RenderTemplateInBuffer(utils.SiteNginxServerTemplate, params)
+	var serverConf *bytes.Buffer
+
+	if sn.config == nil {
+		// если конфиг в конструктор не был передан рендерим дефолтный
+		serverConf, err = sn.RenderConfig()
+		if err != nil {
+			return "", err
+		}
+	} else {
+		// если был передан, используем его
+		b := bytes.Buffer{}
+		b.WriteString(*sn.config)
+		serverConf = &b
+	}
 
 	err = sn.docker.CopyToContainer(ctx, cID, "/etc/nginx/", "nginx.conf", nginxConf)
 	if err != nil {
@@ -71,6 +86,11 @@ func (sn *SiteNginx) Create(ctx context.Context) (string, error) {
 	}
 
 	return cID, nil
+}
+
+func (sn *SiteNginx) RenderConfig() (*bytes.Buffer, error) {
+	params := map[string]string{"Domain": sn.name, "PFAlias": sn.pfAlias}
+	return utils.RenderTemplateInBuffer(utils.SiteNginxServerTemplate, params)
 }
 
 func (sn *SiteNginx) ContainerName() string {
