@@ -29,6 +29,13 @@ func (c *Core) FindProjects(ctx context.Context) (map[string][]types.Container, 
 
 // CreateProject создаст проект
 func (c *Core) CreateProject(ctx context.Context, model *models.ProjectCreate, builders []builder.Builder) error {
+	/*
+		- проверяем корень проектов и (если нет) создаем директорию
+		- внутри директории проверяем директорию с данным проектом и (если нет) создаем
+		- внутри диретории с проектом проверяем директорию точки входа и (если нет) создаем
+		- в директории точки входа проверяем index.php и (если нет) создаем с принтом рыбы
+		- при создании контейнеров прокидываем вольюм с корнем проекта
+	*/
 	pr := project.NewProject(c.docker)
 
 	err := pr.Create(ctx, builders)
