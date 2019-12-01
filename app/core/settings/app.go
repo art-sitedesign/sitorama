@@ -23,14 +23,12 @@ func NewApp() (*App, error) {
 }
 
 func (a *App) Save() error {
-	f, err := a.file()
-
 	data, err := json.Marshal(a)
 	if err != nil {
 		return err
 	}
 
-	_, err = f.Write(data)
+	err = ioutil.WriteFile(appSettingsPath, data, 0755)
 	if err != nil {
 		return err
 	}
@@ -43,6 +41,7 @@ func (a *App) load() error {
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 
 	data, err := ioutil.ReadAll(f)
 	if err != nil {

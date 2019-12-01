@@ -18,11 +18,15 @@ func main() {
 	tmpl := template.Must(template.ParseFiles(
 		"app/templates/html/index.html",
 		"app/templates/html/create.html",
+		"app/templates/html/settings-app.html",
 		"app/templates/html/error.html",
 	))
 
 	http.HandleFunc("/", handlers.Index(tmpl))
 	http.HandleFunc("/init", handlers.Init(tmpl))
+
+	// экшены найтроек
+	http.HandleFunc("/settings/app", handlers.SettingsApp(tmpl))
 
 	// экшены проектов
 	http.HandleFunc("/project/create", handlers.Create(tmpl))
