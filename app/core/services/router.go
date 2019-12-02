@@ -2,13 +2,12 @@ package services
 
 import (
 	"context"
-	"os"
-	"path/filepath"
 
 	"github.com/docker/docker/api/types"
 	"github.com/pkg/errors"
 
 	"github.com/art-sitedesign/sitorama/app/core/docker"
+	"github.com/art-sitedesign/sitorama/app/core/filesystem"
 	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
@@ -45,12 +44,13 @@ func (r *Router) Create(ctx context.Context) (string, error) {
 	hostConfig := docker.DefaultContainerHostConfig()
 	hostConfig.PortBindings = portMap
 
-	err := os.MkdirAll(utils.RouterConfDir, 0755)
+	fs := filesystem.NewFilesystem(utils.RouterConfDir)
+	err := fs.Create()
 	if err != nil {
 		return "", err
 	}
 
-	path, err := filepath.Abs(utils.RouterConfDir)
+	path, err := fs.FullPath()
 	if err != nil {
 		return "", err
 	}

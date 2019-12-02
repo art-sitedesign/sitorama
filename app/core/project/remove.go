@@ -2,8 +2,8 @@ package project
 
 import (
 	"context"
-	"os"
 
+	"github.com/art-sitedesign/sitorama/app/core/filesystem"
 	"github.com/art-sitedesign/sitorama/app/core/services"
 	"github.com/art-sitedesign/sitorama/app/utils"
 )
@@ -26,8 +26,10 @@ func (p *Project) Remove(ctx context.Context, name string) error {
 		}
 	}
 
-	routerConfPath := utils.RouterConfPath(name)
-	err = os.Remove(routerConfPath)
+	confFileName := utils.RouterConfFileName(name)
+
+	fs := filesystem.NewFilesystem(utils.RouterConfDir)
+	err = fs.FileRemove(confFileName)
 	if err != nil {
 		return err
 	}

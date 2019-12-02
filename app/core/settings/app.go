@@ -2,11 +2,9 @@ package settings
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"os"
 )
 
-const appSettingsPath = "app/app-config.json"
+const appSettingsFileName = "app-config.json"
 
 type App struct {
 	ProjectsRoot string
@@ -28,7 +26,7 @@ func (a *App) Save() error {
 		return err
 	}
 
-	err = ioutil.WriteFile(appSettingsPath, data, 0755)
+	err = fileSystem().FileWrite(appSettingsFileName, data)
 	if err != nil {
 		return err
 	}
@@ -37,13 +35,7 @@ func (a *App) Save() error {
 }
 
 func (a *App) load() error {
-	f, err := a.file()
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	data, err := ioutil.ReadAll(f)
+	data, err := fileSystem().FileRead(appSettingsFileName)
 	if err != nil {
 		return err
 	}
@@ -56,13 +48,4 @@ func (a *App) load() error {
 	}
 
 	return nil
-}
-
-func (a *App) file() (*os.File, error) {
-	f, err := os.OpenFile(appSettingsPath, os.O_RDWR, 0755)
-	if os.IsNotExist(err) {
-		f, err = os.Create(appSettingsPath)
-	}
-
-	return f, err
 }

@@ -3,17 +3,18 @@ package utils
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"os/exec"
 	"runtime"
 	"strings"
 	"text/template"
 
 	"github.com/docker/docker/api/types"
+
+	"github.com/art-sitedesign/sitorama/app/core/filesystem"
 )
 
-func RouterConfPath(name string) string {
-	return fmt.Sprintf("%s/%s.conf", RouterConfDir, name)
+func RouterConfFileName(name string) string {
+	return fmt.Sprintf("%s.conf", name)
 }
 
 // ContainerName вернёт имя контейнера с суффиксом
@@ -51,12 +52,10 @@ func ProjectNameFromContainer(c *types.Container) string {
 func CreateRouterConfig(name string, containerAlias string) error {
 	tmpl := template.Must(template.ParseFiles(RouterConfTemplate))
 
-	err := os.MkdirAll(RouterConfDir, 0755)
-	if err != nil {
-		return err
-	}
+	confFileName := RouterConfFileName(name)
 
-	f, err := os.Create(RouterConfPath(name))
+	fs := filesystem.NewFilesystem(RouterConfDir)
+	f, err := fs.FileCreate(confFileName)
 	if err != nil {
 		return err
 	}
