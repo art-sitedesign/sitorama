@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -55,7 +56,7 @@ func CreateRouterConfig(name string, containerAlias string) error {
 	confFileName := RouterConfFileName(name)
 
 	fs := filesystem.NewFilesystem(RouterConfDir)
-	f, err := fs.FileCreate(confFileName)
+	f, err := fs.FileOpenForce(confFileName, os.O_RDWR)
 	if err != nil {
 		return err
 	}

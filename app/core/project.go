@@ -2,11 +2,14 @@ package core
 
 import (
 	"context"
+	"errors"
 
 	"github.com/docker/docker/api/types"
 
 	"github.com/art-sitedesign/sitorama/app/core/builder"
+	"github.com/art-sitedesign/sitorama/app/core/filesystem"
 	"github.com/art-sitedesign/sitorama/app/core/project"
+	"github.com/art-sitedesign/sitorama/app/core/settings"
 	"github.com/art-sitedesign/sitorama/app/models"
 	"github.com/art-sitedesign/sitorama/app/utils"
 )
@@ -29,20 +32,70 @@ func (c *Core) FindProjects(ctx context.Context) (map[string][]types.Container, 
 
 // CreateProject создаст проект
 func (c *Core) CreateProject(ctx context.Context, model *models.ProjectCreate, builders []builder.Builder) error {
+	indexFileName := "index.php"
 	/*
-		- проверяем корень проектов и (если нет) создаем директорию
-		- внутри директории проверяем директорию с данным проектом и (если нет) создаем
-		- внутри диретории с проектом проверяем директорию точки входа и (если нет) создаем
-		- в директории точки входа проверяем index.php и (если нет) создаем с принтом рыбы
 		- при создании контейнеров прокидываем вольюм с корнем проекта
 	*/
-	pr := project.NewProject(c.docker)
-
-	err := pr.Create(ctx, builders)
+	appSettings, err := settings.NewApp()
 	if err != nil {
 		return err
 	}
 
+	if appSettings.ProjectsRoot == "" {
+		return errors.New("projects root is not set")
+	}
+
+	fs := filesystem.NewFilesystem(appSettings.ProjectsRoot)
+
+	// создаем корень для проектов
+	err = fs.Create()
+	if err != nil {
+		return err
+	}
+
+	// создаем директорию для проекта
+	fs.AddDir(model.Domain)
+	err = fs.Create()
+	if err != nil {
+		return err
+	}
+
+	// создаем директорию с точкой входа в проект
+	fs.AddDir(model.EntryPoint)
+	err = fs.Create()
+	if err != nil {
+		return err
+	}
+
+	// создаем шаблонный index.php
+	f, err := fs.FileCreate(indexFileName)
+	if err != nil {
+		return err
+	}
+
+	if f != nil {
+		// если файла небыло и он только что создался - запишем в него шаблон
+		data := map[string]string{"Name": model.Domain}
+		b, err := utils.RenderTemplateInBuffer(utils.IndexPHPTemplate, data)
+		if err != nil {
+			return err
+		}
+
+		err = fs.FileWrite(indexFileName, b.Bytes())
+		if err != nil {
+			return err
+		}
+	}
+
+	// создаем контейнеры проекта
+	pr := project.NewProject(c.docker)
+
+	err = pr.Create(ctx, builders)
+	if err != nil {
+		return err
+	}
+
+	// добавляем домен в /etc/hosts
 	err = utils.AddHost(model.Domain)
 	if err != nil {
 		return ErrorCantChangeHosts

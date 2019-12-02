@@ -9,6 +9,7 @@ import (
 	"github.com/art-sitedesign/sitorama/app/handlers"
 )
 
+//todo: при получении списка контейнеров запилить сортировку
 //todo: годоки дописать
 //todo: конструктор приложения
 //todo: логи сервисов прокидывать наружу или в stdout?

@@ -14,7 +14,7 @@ type Filesystem struct {
 
 func NewFilesystem(path string) *Filesystem {
 	return &Filesystem{
-		path: strings.Trim(path, "/"),
+		path: strings.TrimRight(path, "/"),
 	}
 }
 
@@ -31,14 +31,27 @@ func (fs *Filesystem) Create() error {
 }
 
 func (fs *Filesystem) FileCreate(fileName string) (*os.File, error) {
+	err := fs.CreateIfNotExist()
+	if err != nil {
+		return nil, err
+	}
+
+	if !fs.FileExist(fileName) {
+		return os.Create(fs.filePath(fileName))
+	}
+
+	return nil, nil
+}
+
+func (fs *Filesystem) CreateIfNotExist() error {
 	if !fs.Exist() {
 		err := fs.Create()
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
 
-	return os.Create(fs.filePath(fileName))
+	return nil
 }
 
 func (fs *Filesystem) FullPath() (string, error) {
@@ -77,6 +90,10 @@ func (fs *Filesystem) FileRead(fileName string) ([]byte, error) {
 
 func (fs *Filesystem) FileRemove(fileName string) error {
 	return os.Remove(fs.filePath(fileName))
+}
+
+func (fs *Filesystem) AddDir(dirName string) {
+	fs.path = fs.filePath(dirName)
 }
 
 func (fs *Filesystem) filePath(fileName string) string {

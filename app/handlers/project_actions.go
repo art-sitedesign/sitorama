@@ -107,6 +107,8 @@ func ProjectCreateConfirm(tmpl *template.Template) Handler {
 			writeErr(tmpl, w, err)
 			return
 		}
+
+		http.Redirect(w, r, "/", 302)
 	}
 }
 
