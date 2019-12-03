@@ -11,14 +11,16 @@ import (
 )
 
 type SitePHPFPM struct {
-	docker *docker.Docker
-	name   string
+	docker      *docker.Docker
+	name        string
+	projectPath string
 }
 
-func NewSitePHPFPM(d *docker.Docker, n string) *SitePHPFPM {
+func NewSitePHPFPM(docker *docker.Docker, name string, projectPath string) *SitePHPFPM {
 	return &SitePHPFPM{
-		docker: d,
-		name:   n,
+		docker:      docker,
+		name:        name,
+		projectPath: projectPath,
 	}
 }
 
@@ -43,6 +45,9 @@ func (sp *SitePHPFPM) Create(ctx context.Context) (string, error) {
 	config.Image = "bitnami/php-fpm:latest"
 
 	hostConfig := docker.DefaultContainerHostConfig()
+
+	volumes := docker.MakeVolumes(map[string]string{sp.projectPath: "/app"})
+	hostConfig.Mounts = volumes
 
 	cID, err := sp.docker.CreateContainer(ctx, sp.ContainerName(), config, hostConfig)
 	if err != nil {

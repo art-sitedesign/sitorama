@@ -13,20 +13,29 @@ import (
 )
 
 type SiteNginx struct {
-	docker     *docker.Docker
-	name       string
-	entryPoint string
-	pfAlias    string
-	config     *string
+	docker      *docker.Docker
+	name        string
+	projectPath string
+	entryPoint  string
+	pfAlias     string
+	config      *string
 }
 
-func NewSiteNginx(d *docker.Docker, n string, ep string, pfAlias string, cf *string) *SiteNginx {
+func NewSiteNginx(
+	docker *docker.Docker,
+	name string,
+	projectPath string,
+	entryPoint string,
+	pfAlias string,
+	config *string,
+) *SiteNginx {
 	return &SiteNginx{
-		docker:     d,
-		name:       n,
-		entryPoint: ep,
-		pfAlias:    pfAlias,
-		config:     cf,
+		docker:      docker,
+		name:        name,
+		projectPath: projectPath,
+		entryPoint:  entryPoint,
+		pfAlias:     pfAlias,
+		config:      config,
 	}
 }
 
@@ -51,6 +60,9 @@ func (sn *SiteNginx) Create(ctx context.Context) (string, error) {
 	config.Image = "nginx:latest"
 
 	hostConfig := docker.DefaultContainerHostConfig()
+
+	volumes := docker.MakeVolumes(map[string]string{sn.projectPath: "/app"})
+	hostConfig.Mounts = volumes
 
 	cID, err := sn.docker.CreateContainer(ctx, sn.ContainerName(), config, hostConfig)
 	if err != nil {

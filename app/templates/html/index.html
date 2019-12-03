@@ -61,6 +61,7 @@
         <table>
             <tr>
                 <td><h4>{{.Name}}</h4></td>
+                <td><a href="http://{{.Name}}/" target="_blank">Открыть в новой вкладке</a></td>
                 {{if .Active}}
                     <td>Активный</td>
                     <td><a href="/project/stop?name={{.Name}}">Остановить</a></td>

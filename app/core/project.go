@@ -33,9 +33,7 @@ func (c *Core) FindProjects(ctx context.Context) (map[string][]types.Container, 
 // CreateProject создаст проект
 func (c *Core) CreateProject(ctx context.Context, model *models.ProjectCreate, builders []builder.Builder) error {
 	indexFileName := "index.php"
-	/*
-		- при создании контейнеров прокидываем вольюм с корнем проекта
-	*/
+
 	appSettings, err := settings.NewApp()
 	if err != nil {
 		return err

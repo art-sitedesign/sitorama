@@ -12,6 +12,7 @@ import (
 	"github.com/docker/docker/api/types"
 
 	"github.com/art-sitedesign/sitorama/app/core/filesystem"
+	"github.com/art-sitedesign/sitorama/app/core/settings"
 )
 
 func RouterConfFileName(name string) string {
@@ -73,6 +74,19 @@ func CreateRouterConfig(name string, containerAlias string) error {
 	}
 
 	return nil
+}
+
+// ProjectFullPath вернёт абсолютный путь до корневой директории проекта
+func ProjectFullPath(name string) (string, error) {
+	s, err := settings.NewApp()
+	if err != nil {
+		return "", err
+	}
+
+	fs := filesystem.NewFilesystem(s.ProjectsRoot)
+	fs.AddDir(name)
+
+	return fs.FullPath()
 }
 
 // AddHost добавит домен для локального хоста

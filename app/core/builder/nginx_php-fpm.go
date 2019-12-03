@@ -72,9 +72,13 @@ func (np *NginxPHPFPM) SetConfig(config Config) {
 
 func (np *NginxPHPFPM) Build(ctx context.Context) error {
 	ngAlias, _ := np.aliases()
+	projectPath, err := utils.ProjectFullPath(np.name)
+	if err != nil {
+		return err
+	}
 
 	// создание конфиг-фалйа для роутера
-	err := utils.CreateRouterConfig(np.name, ngAlias)
+	err = utils.CreateRouterConfig(np.name, ngAlias)
 	if err != nil {
 		return err
 	}
@@ -86,12 +90,12 @@ func (np *NginxPHPFPM) Build(ctx context.Context) error {
 	}
 
 	// сборка контейнера PHP-FPM
-	err = np.buildPHPFPM(ctx, network.ID)
+	err = np.buildPHPFPM(ctx, network.ID, projectPath)
 	if err != nil {
 		return err
 	}
 
-	err = np.buildNginx(ctx, network.ID)
+	err = np.buildNginx(ctx, network.ID, projectPath)
 	if err != nil {
 		return err
 	}
@@ -111,10 +115,10 @@ func (np *NginxPHPFPM) Build(ctx context.Context) error {
 	return nil
 }
 
-func (np *NginxPHPFPM) buildPHPFPM(ctx context.Context, networkID string) error {
+func (np *NginxPHPFPM) buildPHPFPM(ctx context.Context, networkID string, projectPath string) error {
 	_, pfAlias := np.aliases()
 	// поиск PHP-FPM контейнера
-	sitePHPFPM := services.NewSitePHPFPM(np.docker, np.name)
+	sitePHPFPM := services.NewSitePHPFPM(np.docker, np.name, projectPath)
 	pfContainer, err := sitePHPFPM.Find(ctx)
 	if err != nil {
 		return err
@@ -143,7 +147,7 @@ func (np *NginxPHPFPM) buildPHPFPM(ctx context.Context, networkID string) error 
 	return nil
 }
 
-func (np *NginxPHPFPM) buildNginx(ctx context.Context, networkID string) error {
+func (np *NginxPHPFPM) buildNginx(ctx context.Context, networkID string, projectPath string) error {
 	ngAlias, pfAlias := np.aliases()
 
 	var nConfP *string
@@ -154,7 +158,7 @@ func (np *NginxPHPFPM) buildNginx(ctx context.Context, networkID string) error {
 		nConfP = nil
 	}
 
-	siteNginx := services.NewSiteNginx(np.docker, np.name, np.entryPoint, pfAlias, nConfP)
+	siteNginx := services.NewSiteNginx(np.docker, np.name, projectPath, np.entryPoint, pfAlias, nConfP)
 	container, err := siteNginx.Find(ctx)
 	if err != nil {
 		return err
@@ -185,7 +189,12 @@ func (np *NginxPHPFPM) buildNginx(ctx context.Context, networkID string) error {
 
 func (np *NginxPHPFPM) nginxConfig() (string, error) {
 	_, pfAlias := np.aliases()
-	siteNginx := services.NewSiteNginx(np.docker, np.name, np.entryPoint, pfAlias, nil)
+	projectPath, err := utils.ProjectFullPath(np.name)
+	if err != nil {
+		return "", err
+	}
+
+	siteNginx := services.NewSiteNginx(np.docker, np.name, projectPath, np.entryPoint, pfAlias, nil)
 	nConf, err := siteNginx.RenderConfig()
 	if err != nil {
 		return "", err
