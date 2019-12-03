@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	NginxPHPFPMConfigNginx = "nginx-config"
+	nginxPHPFPMConfigNginx = "nginx-config"
 )
 
 type NginxPHPFPM struct {
@@ -35,13 +35,13 @@ func (np *NginxPHPFPM) Name() string {
 
 func (np *NginxPHPFPM) ConfigNames() []string {
 	return []string{
-		NginxPHPFPMConfigNginx,
+		nginxPHPFPMConfigNginx,
 	}
 }
 
 func (np *NginxPHPFPM) ConfigByName(name string) (string, error) {
 	switch name {
-	case NginxPHPFPMConfigNginx:
+	case nginxPHPFPMConfigNginx:
 		nConf, err := np.nginxConfig()
 		if err != nil {
 			return "", err
@@ -50,20 +50,6 @@ func (np *NginxPHPFPM) ConfigByName(name string) (string, error) {
 	default:
 		return "", errors.New("unknown config " + name)
 	}
-}
-
-func (np *NginxPHPFPM) PrepareConfig() (Config, error) {
-	conf := Config{}
-
-	for _, name := range np.ConfigNames() {
-		c, err := np.ConfigByName(name)
-		if err != nil {
-			return nil, err
-		}
-		conf[name] = c
-	}
-
-	return conf, nil
 }
 
 func (np *NginxPHPFPM) SetConfig(config Config) {
@@ -149,16 +135,9 @@ func (np *NginxPHPFPM) buildPHPFPM(ctx context.Context, networkID string, projec
 
 func (np *NginxPHPFPM) buildNginx(ctx context.Context, networkID string, projectPath string) error {
 	ngAlias, pfAlias := np.aliases()
+	nConf := np.config.String(nginxPHPFPMConfigNginx)
 
-	var nConfP *string
-	nConf, ok := np.config[NginxPHPFPMConfigNginx]
-	if ok {
-		nConfP = &nConf
-	} else {
-		nConfP = nil
-	}
-
-	siteNginx := services.NewSiteNginx(np.docker, np.name, projectPath, np.entryPoint, pfAlias, nConfP)
+	siteNginx := services.NewSiteNginx(np.docker, np.name, projectPath, np.entryPoint, pfAlias, nConf)
 	container, err := siteNginx.Find(ctx)
 	if err != nil {
 		return err

@@ -8,12 +8,9 @@ type Builder interface {
 	Name() string
 	ConfigNames() []string
 	ConfigByName(name string) (string, error)
-	PrepareConfig() (Config, error)
 	SetConfig(config Config)
 	Build(ctx context.Context) error
 }
-
-type Config map[string]string
 
 const (
 	BuilderNginxPHPFPM = 1
@@ -40,3 +37,31 @@ var (
 		BuilderMemcached: "Memcached",
 	}
 )
+
+type Config map[string]string
+
+func (c Config) String(key string) *string {
+	var res *string
+	conf, ok := c[key]
+	if ok {
+		res = &conf
+	} else {
+		res = nil
+	}
+
+	return res
+}
+
+func PrepareConfig(builder Builder) (Config, error) {
+	conf := Config{}
+
+	for _, name := range builder.ConfigNames() {
+		c, err := builder.ConfigByName(name)
+		if err != nil {
+			return nil, err
+		}
+		conf[name] = c
+	}
+
+	return conf, nil
+}

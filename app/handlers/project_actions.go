@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -33,7 +34,7 @@ func ProjectCreate(tmpl *template.Template) Handler {
 
 			data := make(map[string]builder.Config)
 			for _, b := range builders {
-				conf, err := b.PrepareConfig()
+				conf, err := builder.PrepareConfig(b)
 				if err != nil {
 					writeErr(tmpl, w, err)
 					return
@@ -66,6 +67,11 @@ func ProjectCreate(tmpl *template.Template) Handler {
 
 func ProjectCreateConfirm(tmpl *template.Template) Handler {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			writeErr(tmpl, w, errors.New("method not allowed"))
+			return
+		}
+
 		err := r.ParseForm()
 		if err != nil {
 			writeErr(tmpl, w, err)

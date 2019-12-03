@@ -31,7 +31,7 @@ func (c *Core) createWebServer(model *models.ProjectCreate) builder.Builder {
 	case builder.BuilderNginxPHPFPM:
 		return builder.NewNginxPHPFPM(c.docker, model.Domain, model.EntryPoint)
 	case builder.BuilderApache:
-		return nil
+		return builder.NewApache(c.docker, model.Domain, model.EntryPoint)
 	default:
 		return nil
 	}

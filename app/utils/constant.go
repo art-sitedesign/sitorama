@@ -9,6 +9,7 @@ const (
 
 	SiteNginxBaseTemplate   = "app/templates/nginx/site-nginx.conf"
 	SiteNginxServerTemplate = "app/templates/nginx/site-server.conf"
+	ApacheServerTemplate    = "app/templates/apache/server.conf"
 
 	IndexPHPTemplate = "app/templates/php/index.php"
 )
