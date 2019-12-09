@@ -5,6 +5,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
@@ -116,4 +118,51 @@ func (d *Docker) CopyToContainer(ctx context.Context, containerID string, path s
 	}
 
 	return d.client.CopyToContainer(ctx, containerID, path, &buf, options)
+}
+
+// ExecInContainer выполнит bash команду внутри контейнера
+func (d *Docker) ExecInContainer(ctx context.Context, containerID string, commands []string) error {
+	for _, command := range commands {
+		config := types.ExecConfig{
+			User:         "",
+			Privileged:   false,
+			Tty:          false,
+			AttachStdin:  false,
+			AttachStderr: false,
+			AttachStdout: false,
+			Detach:       false,
+			DetachKeys:   "",
+			Env:          nil,
+			Cmd:          []string{"/bin/bash", "-c", command},
+		}
+		resp, err := d.client.ContainerExecCreate(ctx, containerID, config)
+		if err != nil {
+			return err
+		}
+
+		startConfig := types.ExecStartCheck{
+			Detach: false,
+			Tty:    false,
+		}
+		err = d.client.ContainerExecStart(ctx, resp.ID, startConfig)
+		if err != nil {
+			return err
+		}
+
+		for i := 0; i < 60; i++ {
+			// делаем 60 попыток проверить статус команды и если нет - выходим (за минуту нужно успеть)
+			inspectResp, err := d.client.ContainerExecInspect(ctx, resp.ID)
+			if err != nil {
+				return err
+			}
+
+			if !inspectResp.Running {
+				break
+			}
+
+			time.Sleep(time.Millisecond * 1000)
+		}
+	}
+
+	return nil
 }

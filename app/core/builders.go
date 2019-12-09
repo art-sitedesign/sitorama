@@ -40,7 +40,7 @@ func (c *Core) createWebServer(model *models.ProjectCreate) builder.Builder {
 func (c *Core) createDatabase(model *models.ProjectCreate) builder.Builder {
 	switch model.Database {
 	case builder.BuilderPostgres:
-		return nil
+		return builder.NewPostgres(c.docker, model.Domain)
 	case builder.BuilderMySQL:
 		return nil
 	default:

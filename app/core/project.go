@@ -72,8 +72,18 @@ func (c *Core) CreateProject(ctx context.Context, model *models.ProjectCreate, b
 	}
 
 	if f != nil {
+		checkers := make([]string, 0, len(builders))
+		for _, b := range builders {
+			ch, err := b.Checker()
+			if err != nil {
+				return err
+			}
+
+			checkers = append(checkers, ch)
+		}
+
 		// если файла небыло и он только что создался - запишем в него шаблон
-		data := map[string]string{"Name": model.Domain}
+		data := map[string][]string{"Checkers": checkers}
 		b, err := utils.RenderTemplateInBuffer(utils.IndexPHPTemplate, data)
 		if err != nil {
 			return err

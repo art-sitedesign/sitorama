@@ -56,6 +56,10 @@ func (np *NginxPHPFPM) SetConfig(config Config) {
 	np.config = config
 }
 
+func (np *NginxPHPFPM) Checker() (string, error) {
+	return renderChecker("base.php", map[string]string{"Name": np.name})
+}
+
 func (np *NginxPHPFPM) Build(ctx context.Context) error {
 	ngAlias, _ := np.aliases()
 	projectPath, err := utils.ProjectFullPath(np.name)

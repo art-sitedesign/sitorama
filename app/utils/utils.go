@@ -89,6 +89,28 @@ func ProjectFullPath(name string) (string, error) {
 	return fs.FullPath()
 }
 
+// ProjectVolumesFullPath вернёт абсолютный путь до директории с вольюмами проекта
+func ProjectVolumeFullPath(projectName string, volumeName string) (string, error) {
+	s, err := settings.NewApp()
+	if err != nil {
+		return "", err
+	}
+
+	fs := filesystem.NewFilesystem(s.ProjectsRoot)
+	fs.AddDir(projectName)
+	fs.AddDir(ProjectVolumesPath)
+	fs.AddDir(volumeName)
+
+	if !fs.Exist() {
+		err = fs.Create()
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return fs.FullPath()
+}
+
 // AddHost добавит домен для локального хоста
 func AddHost(name string) error {
 	build := "linux"

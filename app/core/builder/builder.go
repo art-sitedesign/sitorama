@@ -2,6 +2,9 @@ package builder
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
 type Builder interface {
@@ -9,6 +12,7 @@ type Builder interface {
 	ConfigNames() []string
 	ConfigByName(name string) (string, error)
 	SetConfig(config Config)
+	Checker() (string, error)
 	Build(ctx context.Context) error
 }
 
@@ -64,4 +68,13 @@ func PrepareConfig(builder Builder) (Config, error) {
 	}
 
 	return conf, nil
+}
+
+func renderChecker(name string, data interface{}) (string, error) {
+	buf, err := utils.RenderTemplateInBuffer(fmt.Sprintf("%s/%s", utils.CheckersDir, name), data)
+	if err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
 }

@@ -44,12 +44,12 @@ func (a *Apache) Find(ctx context.Context) (*types.Container, error) {
 }
 
 func (a *Apache) Create(ctx context.Context) (string, error) {
-	portSet, _ := docker.BindPorts(map[string]string{"80": "80"})
+	//portSet, _ := docker.BindPorts(map[string]string{"80": "80"})
 
 	config := docker.DefaultContainerConfig()
 	//config.User = "www-data:www-data"
 	//config.WorkingDir = "/app"
-	config.ExposedPorts = portSet
+	//config.ExposedPorts = portSet
 	config.Image = "library/php:7.2-apache"
 
 	hostConfig := docker.DefaultContainerHostConfig()

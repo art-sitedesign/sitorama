@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/art-sitedesign/sitorama/app/core/docker"
+	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
 type SitePHPFPM struct {
@@ -50,6 +51,26 @@ func (sp *SitePHPFPM) Create(ctx context.Context) (string, error) {
 	hostConfig.Mounts = volumes
 
 	cID, err := sp.docker.CreateContainer(ctx, sp.ContainerName(), config, hostConfig)
+	if err != nil {
+		return "", err
+	}
+
+	phpIni, err := utils.RenderTemplateInBuffer(utils.PHPIniTemplate, nil)
+	if err != nil {
+		return "", err
+	}
+
+	phpLibs, err := utils.RenderTemplateInBuffer(utils.PHPLibsTemplate, nil)
+	if err != nil {
+		return "", err
+	}
+
+	err = sp.docker.CopyToContainer(ctx, cID, "/opt/bitnami/php/etc/conf.d/", "sitorama.ini", phpIni)
+	if err != nil {
+		return "", err
+	}
+
+	err = sp.docker.CopyToContainer(ctx, cID, "/opt/bitnami/php/etc/conf.d/", "libs.ini", phpLibs)
 	if err != nil {
 		return "", err
 	}

@@ -57,6 +57,10 @@ func (a *Apache) SetConfig(config Config) {
 	a.config = config
 }
 
+func (a *Apache) Checker() (string, error) {
+	return renderChecker("base.php", map[string]string{"Name": a.name})
+}
+
 func (a *Apache) Build(ctx context.Context) error {
 	// создание конфиг-фалйа для роутера
 	err := utils.CreateRouterConfig(a.name, a.alias())
@@ -117,6 +121,22 @@ func (a *Apache) buildContainer(ctx context.Context, networkID string) error {
 
 		// стартуем готовый контейнер
 		err = a.docker.StartContainer(ctx, cID)
+		if err != nil {
+			return err
+		}
+
+		err = a.docker.ExecInContainer(ctx, cID, []string{
+			"apt update",
+			"apt -y install libpq-dev",
+			"docker-php-ext-install pdo",
+			"docker-php-ext-install pdo_pgsql",
+			"docker-php-ext-install pgsql",
+		})
+		if err != nil {
+			return err
+		}
+
+		err = a.docker.RestartContainer(ctx, cID)
 		if err != nil {
 			return err
 		}

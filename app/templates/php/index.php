@@ -1,5 +1,9 @@
 <?php
 
-echo '<h3>Это шаблонный файл нового проекта - <b>{{.Name}}</b><h3>';
+{{range $i, $checker := .Checkers}}
+{{$checker}}
+echo '<hr>';
+
+{{end}}
 
 ?>
