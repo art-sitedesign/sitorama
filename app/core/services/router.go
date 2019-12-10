@@ -39,7 +39,7 @@ func (r *Router) Create(ctx context.Context) (string, error) {
 
 	config := docker.DefaultContainerConfig()
 	config.ExposedPorts = portSet
-	config.Image = "nginx:latest"
+	config.Image = "library/nginx:latest"
 
 	hostConfig := docker.DefaultContainerHostConfig()
 	hostConfig.PortBindings = portMap

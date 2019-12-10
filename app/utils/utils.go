@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"fmt"
+	"net"
 	"os"
 	"os/exec"
 	"runtime"
@@ -131,6 +132,28 @@ func RemoveHost(name string) error {
 
 	cmd := exec.Command("make", "hm.rm", "E="+build, "D="+name)
 	return cmd.Run()
+}
+
+// FindNearPort найдет ближайший свободный порт к переданному увеличивая значение при каждой попытке
+func FindNearPort(from int) int {
+	for !IsPortFree(from) {
+		from++
+	}
+
+	return from
+}
+
+// IsPortFree проверить свободен ли порт
+func IsPortFree(port int) bool {
+	ln, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+
+	if err != nil {
+		return false
+	}
+
+	_ = ln.Close()
+
+	return true
 }
 
 // isDarwin вернет тип ОС. Костыль. Временно. Пока не хочу заморачиваться с нормальным сборщиком под ОС

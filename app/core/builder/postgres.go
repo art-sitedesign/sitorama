@@ -3,7 +3,10 @@ package builder
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	"github.com/art-sitedesign/sitorama/app/core/docker"
 	"github.com/art-sitedesign/sitorama/app/core/services"
@@ -14,11 +17,15 @@ const (
 	defaultUser     = "postgres"
 	defaultPassword = "sitorama"
 	pgDataDir       = "postgres"
+
+	postgresDefaultPort = 5432
+	postgresForwardPort = "forwardPort"
 )
 
 type Postgres struct {
 	docker *docker.Docker
 	name   string
+	config Config
 }
 
 func NewPostgres(docker *docker.Docker, name string) Builder {
@@ -33,14 +40,23 @@ func (p *Postgres) Name() string {
 }
 
 func (p *Postgres) ConfigNames() []string {
-	return []string{}
+	return []string{
+		postgresForwardPort,
+	}
 }
 
 func (p *Postgres) ConfigByName(name string) (string, error) {
-	return "", nil
+	switch name {
+	case postgresForwardPort:
+		freePort := utils.FindNearPort(postgresDefaultPort)
+		return strconv.Itoa(freePort), nil
+	default:
+		return "", errors.New("unknown config " + name)
+	}
 }
 
 func (p *Postgres) SetConfig(config Config) {
+	p.config = config
 }
 
 func (p *Postgres) Checker() (string, error) {
@@ -74,7 +90,15 @@ func (p *Postgres) buildContainer(ctx context.Context, networkID string) error {
 		return err
 	}
 
-	servicePostgres := services.NewPostgres(p.docker, p.name, p.user(), p.password(), p.dbName(), pgDataPath)
+	servicePostgres := services.NewPostgres(
+		p.docker,
+		p.name,
+		p.portToForward(),
+		p.user(),
+		p.password(),
+		p.dbName(),
+		pgDataPath,
+	)
 
 	container, err := servicePostgres.Find(ctx)
 	if err != nil {
@@ -118,4 +142,13 @@ func (p *Postgres) password() string {
 
 func (p Postgres) dbName() string {
 	return strings.Replace(p.name, ".", "_", -1)
+}
+
+func (p *Postgres) portToForward() string {
+	confPort := p.config.String(postgresForwardPort)
+	if confPort != nil {
+		return *confPort
+	}
+
+	return strconv.Itoa(postgresDefaultPort)
 }

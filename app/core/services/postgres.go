@@ -15,29 +15,32 @@ const (
 )
 
 type Postgres struct {
-	docker     *docker.Docker
-	name       string
-	dbUser     string
-	dbPass     string
-	dbName     string
-	pgDataPath string
+	docker      *docker.Docker
+	name        string
+	forwardPort string
+	dbUser      string
+	dbPass      string
+	dbName      string
+	pgDataPath  string
 }
 
 func NewPostgres(
 	docker *docker.Docker,
 	name string,
+	forwardPort string,
 	dbUser string,
 	dbPass string,
 	dbName string,
 	pgDataPath string,
 ) *Postgres {
 	return &Postgres{
-		docker:     docker,
-		name:       name,
-		dbUser:     dbUser,
-		dbPass:     dbPass,
-		dbName:     dbName,
-		pgDataPath: pgDataPath,
+		docker:      docker,
+		name:        name,
+		forwardPort: forwardPort,
+		dbUser:      dbUser,
+		dbPass:      dbPass,
+		dbName:      dbName,
+		pgDataPath:  pgDataPath,
 	}
 }
 
@@ -55,7 +58,7 @@ func (p *Postgres) Find(ctx context.Context) (*types.Container, error) {
 }
 
 func (p *Postgres) Create(ctx context.Context) (string, error) {
-	portSet, _ := docker.BindPorts(map[string]string{"5432": "5432"})
+	portSet, portMap := docker.BindPorts(map[string]string{p.forwardPort: "5432"})
 
 	config := docker.DefaultContainerConfig()
 	config.ExposedPorts = portSet
@@ -68,6 +71,7 @@ func (p *Postgres) Create(ctx context.Context) (string, error) {
 	}
 
 	hostConfig := docker.DefaultContainerHostConfig()
+	hostConfig.PortBindings = portMap
 
 	volumes := docker.MakeVolumes(map[string]string{p.pgDataPath: defaultPGData})
 	hostConfig.Mounts = volumes
