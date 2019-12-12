@@ -5,6 +5,7 @@ import (
 
 	"github.com/art-sitedesign/sitorama/app/core/project"
 	"github.com/art-sitedesign/sitorama/app/core/services"
+	"github.com/art-sitedesign/sitorama/app/core/settings"
 	"github.com/art-sitedesign/sitorama/app/utils"
 )
 
@@ -24,13 +25,18 @@ func (c *Core) State(ctx context.Context) (*AppState, error) {
 		return nil, err
 	}
 
+	projectsSettings, err := settings.NewProjects()
+	if err != nil {
+		return nil, err
+	}
+
 	projects := make([]*project.State, 0, len(prContainers))
 	for prName, prConts := range prContainers {
 		if prName == utils.RouterName {
 			continue
 		}
 
-		projects = append(projects, project.ProjectState(prName, prConts))
+		projects = append(projects, project.ProjectState(prName, prConts, projectsSettings))
 	}
 
 	return &AppState{

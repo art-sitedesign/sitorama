@@ -19,6 +19,9 @@ func ProjectCreate(tmpl *template.Template) Handler {
 		if r.Method == "POST" {
 			d := r.PostFormValue("domain")
 			ep := strings.TrimLeft(r.PostFormValue("entryPoint"), "/")
+			if ep == "" {
+				ep = "./"
+			}
 			ws, _ := strconv.Atoi(r.PostFormValue("webServer"))
 			db, _ := strconv.Atoi(r.PostFormValue("database"))
 			c, _ := strconv.Atoi(r.PostFormValue("cache"))

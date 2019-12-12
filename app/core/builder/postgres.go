@@ -68,6 +68,18 @@ func (p *Postgres) Checker() (string, error) {
 	})
 }
 
+func (p *Postgres) Info() map[string]string {
+	return map[string]string{
+		"Public host":  "127.0.0.1",
+		"Public port":  p.portToForward(),
+		"Private host": p.alias(),
+		"Private port": services.PostgresPort,
+		"User":         p.user(),
+		"Password":     p.password(),
+		"DB name":      p.dbName(),
+	}
+}
+
 func (p *Postgres) Build(ctx context.Context) error {
 	// поиск сети приложения
 	network, err := p.docker.FindNetwork(ctx)

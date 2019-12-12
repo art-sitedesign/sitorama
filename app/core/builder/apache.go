@@ -61,6 +61,12 @@ func (a *Apache) Checker() (string, error) {
 	return renderChecker("base.php", map[string]string{"Name": a.name})
 }
 
+func (a *Apache) Info() map[string]string {
+	return map[string]string{
+		"Private host": a.alias(),
+	}
+}
+
 func (a *Apache) Build(ctx context.Context) error {
 	// создание конфиг-фалйа для роутера
 	err := utils.CreateRouterConfig(a.name, a.alias())

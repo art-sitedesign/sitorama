@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	PostgresPort  = "5432"
 	defaultPGData = "/var/lib/postgresql/data/pgdata"
 )
 
@@ -58,7 +59,7 @@ func (p *Postgres) Find(ctx context.Context) (*types.Container, error) {
 }
 
 func (p *Postgres) Create(ctx context.Context) (string, error) {
-	portSet, portMap := docker.BindPorts(map[string]string{p.forwardPort: "5432"})
+	portSet, portMap := docker.BindPorts(map[string]string{p.forwardPort: PostgresPort})
 
 	config := docker.DefaultContainerConfig()
 	config.ExposedPorts = portSet

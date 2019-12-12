@@ -14,6 +14,7 @@ type Builder interface {
 	SetConfig(config Config)
 	Checker() (string, error)
 	Build(ctx context.Context) error
+	Info() map[string]string
 }
 
 const (

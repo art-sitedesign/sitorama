@@ -1,4 +1,5 @@
 .idea
 app/app-config.json
+app/projects-config.json
 volumes/router
 host-manager

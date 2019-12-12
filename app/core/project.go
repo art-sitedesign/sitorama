@@ -96,7 +96,7 @@ func (c *Core) CreateProject(ctx context.Context, model *models.ProjectCreate, b
 	}
 
 	// создаем контейнеры проекта
-	pr := project.NewProject(c.docker)
+	pr := project.NewProject(c.docker, model.Domain)
 
 	err = pr.Create(ctx, builders)
 	if err != nil {
@@ -114,21 +114,21 @@ func (c *Core) CreateProject(ctx context.Context, model *models.ProjectCreate, b
 
 // StartProject запустит контейнеры проекта
 func (c *Core) StartProject(ctx context.Context, name string) error {
-	pr := project.NewProject(c.docker)
+	pr := project.NewProject(c.docker, name)
 
 	return pr.Start(ctx, name)
 }
 
 // StopProject остановит контейнеры проекта
 func (c *Core) StopProject(ctx context.Context, name string) error {
-	pr := project.NewProject(c.docker)
+	pr := project.NewProject(c.docker, name)
 
 	return pr.Stop(ctx, name)
 }
 
 // RemoveProject удалит проект
 func (c *Core) RemoveProject(ctx context.Context, name string) error {
-	pr := project.NewProject(c.docker)
+	pr := project.NewProject(c.docker, name)
 
 	err := pr.Remove(ctx, name)
 	if err != nil {

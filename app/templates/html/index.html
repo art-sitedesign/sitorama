@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Sitorama</title>
+    <style>
+        table td {
+            border: 1px solid #1d1d1d;
+        }
+    </style>
 </head>
 <body>
 <h1>Привет! Это Sitorama</h1>
@@ -18,7 +23,7 @@
 
 </h4>
 <div>
-    <h3>Состояние роутера:</h3>
+    <h2>Состояние роутера:</h2>
     <table>
         <tr>
             <td>ID</td>
@@ -56,11 +61,12 @@
 </div>
 
 <div>
-    <h3>Состояние проектов:</h3>
+    <h2>Состояние проектов:</h2>
     {{range .State.Projects}}
+        <h3>{{.Name}}</h3>
+        <h4>Действия:</h4>
         <table>
             <tr>
-                <td><h4>{{.Name}}</h4></td>
                 <td><a href="http://{{.Name}}/" target="_blank">Открыть в новой вкладке</a></td>
                 {{if .Active}}
                     <td>Активный</td>
@@ -72,6 +78,7 @@
                 {{end}}
             </tr>
         </table>
+        <h4>Контейнеры:</h4>
         <table>
             <tr>
                 <td>ID</td>
@@ -106,6 +113,24 @@
                 </tr>
             {{end}}
         </table>
+        <h4>Информация:</h4>
+        <table>
+            <tr>
+                <td>Билдер</td>
+                <td>Параметр</td>
+                <td>Значение</td>
+            </tr>
+            {{range $builder, $settings := .Info}}
+                {{range $key, $val := $settings}}
+                    <tr>
+                        <td>{{$builder}}</td>
+                        <td>{{$key}}</td>
+                        <td>{{$val}}</td>
+                    </tr>
+                {{end}}
+            {{end}}
+        </table>
+        <hr>
     {{end}}
 </div>
 

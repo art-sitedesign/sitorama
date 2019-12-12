@@ -60,6 +60,14 @@ func (np *NginxPHPFPM) Checker() (string, error) {
 	return renderChecker("base.php", map[string]string{"Name": np.name})
 }
 
+func (np *NginxPHPFPM) Info() map[string]string {
+	ngAlias, pfAlias := np.aliases()
+	return map[string]string{
+		"Private nginx host":   ngAlias,
+		"Private php-fpm host": pfAlias,
+	}
+}
+
 func (np *NginxPHPFPM) Build(ctx context.Context) error {
 	ngAlias, _ := np.aliases()
 	projectPath, err := utils.ProjectFullPath(np.name)

@@ -18,7 +18,7 @@ func SettingsApp(tmpl *template.Template) Handler {
 		if r.Method == "POST" {
 			projectsRoot := r.FormValue("projectsRoot")
 			appSettings.ProjectsRoot = projectsRoot
-			err = appSettings.Save()
+			err = settings.Save(appSettings)
 			if err != nil {
 				writeErr(tmpl, w, err)
 				return
