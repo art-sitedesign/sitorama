@@ -14,9 +14,8 @@ import (
 )
 
 const (
-	defaultUser     = "postgres"
-	defaultPassword = "sitorama"
-	pgDataDir       = "postgres"
+	pgDefaultUser = "postgres"
+	pgDataDir     = "postgres"
 
 	postgresDefaultPort = 5432
 	postgresForwardPort = "forwardPort"
@@ -145,7 +144,7 @@ func (p *Postgres) alias() string {
 }
 
 func (p *Postgres) user() string {
-	return defaultUser
+	return pgDefaultUser
 }
 
 func (p *Postgres) password() string {

@@ -42,7 +42,7 @@ func (c *Core) createDatabase(model *models.ProjectCreate) builder.Builder {
 	case builder.BuilderPostgres:
 		return builder.NewPostgres(c.docker, model.Domain)
 	case builder.BuilderMySQL:
-		return nil
+		return builder.NewMySQL(c.docker, model.Domain)
 	default:
 		return nil
 	}

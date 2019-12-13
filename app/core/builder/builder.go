@@ -18,6 +18,8 @@ type Builder interface {
 }
 
 const (
+	defaultPassword = "sitorama"
+
 	BuilderNginxPHPFPM = 1
 	BuilderApache      = 2
 	BuilderPostgres    = 3
