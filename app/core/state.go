@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"sort"
 
 	"github.com/art-sitedesign/sitorama/app/core/project"
 	"github.com/art-sitedesign/sitorama/app/core/services"
@@ -38,6 +39,10 @@ func (c *Core) State(ctx context.Context) (*AppState, error) {
 
 		projects = append(projects, project.ProjectState(prName, prConts, projectsSettings))
 	}
+
+	sort.Slice(projects, func(i, j int) bool {
+		return projects[i].Name < projects[j].Name
+	})
 
 	return &AppState{
 		Router:   rState,

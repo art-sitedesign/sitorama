@@ -3,11 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Sitorama</title>
+    <style>
+        input {
+            padding: 5px;
+            width: 400px;
+        }
+        button {
+            padding: 5px;
+            width: 200px;
+        }
+    </style>
 </head>
 <body>
 <h2>Настройки приложения</h2>
 <form method="post">
-    <input type="text" name="projectsRoot" placeholder="Полный путь до директории с проектами" value="{{.ProjectsRoot}}">
+    <input type="text" name="projectsRoot" placeholder="Полный путь до директории с проектами"
+           value="{{.ProjectsRoot}}">
     <button type="submit">Сохранить</button>
 </form>
 </body>

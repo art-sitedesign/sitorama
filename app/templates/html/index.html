@@ -5,17 +5,54 @@
     <title>Sitorama</title>
     <style>
         table td {
-            border: 1px solid #1d1d1d;
+            border: 1px solid #060606;
+            padding: 5px;
+        }
+
+        .button {
+            padding: 5px;
+            min-width: 150px;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            color: #060606;
+            border: 1px solid;
+            background-color: #e6e6e6;
+        }
+
+        .button:hover {
+            background-color: #ef99f9;
+        }
+
+        .button.big {
+            min-width: 300px;
+        }
+
+        .label {
+            padding: 5px;
+            border: 1px solid;
+            font-size: 12px;
+            font-weight: normal;
+        }
+
+        .label.active {
+            background-color: #8fd881;
+        }
+
+        .label.inactive {
+            background-color: #d88199;
         }
     </style>
 </head>
 <body>
 <h1>Привет! Это Sitorama</h1>
 <h2>сервис для локального деплоя веб-приложений на основе docker</h2>
-
+<a class="button big" href="/project/create">Создать проект!</a>
 <div>
     {{if .AppSettings.ProjectsRoot}}
-        <h4>Корневая директория проектов: {{.AppSettings.ProjectsRoot}} <a href="/settings/app">Настройки</a></h4>
+        <h4>Корневая директория проектов:</h4>
+        <p>{{.AppSettings.ProjectsRoot}}</p>
+        <a class="button" href="/settings/app">Настройки</a></h4>
     {{else}}
         <h4>НАДО ЗАПОЛНИТЬ КОРЕНЬ ПРОЕКТОВ: <a href="/settings/app">Настройки</a></h4>
     {{end}}
@@ -63,21 +100,22 @@
 <div>
     <h2>Состояние проектов:</h2>
     {{range .State.Projects}}
-        <h3>{{.Name}}</h3>
+        <h3>
+            {{.Name}}
+            {{if .Active}}
+                <span class="label active">Запущен</span>
+             {{else}}
+                <span class="label inactive">Остановлен</span>
+             {{end}}
+        </h3>
         <h4>Действия:</h4>
-        <table>
-            <tr>
-                <td><a href="http://{{.Name}}/" target="_blank">Открыть в новой вкладке</a></td>
-                {{if .Active}}
-                    <td>Активный</td>
-                    <td><a href="/project/stop?name={{.Name}}">Остановить</a></td>
-                {{else}}
-                    <td>Неактивный</td>
-                    <td><a href="/project/start?name={{.Name}}">Запустить</a></td>
-                    <td><a href="/project/remove?name={{.Name}}">Удалить</a></td>
-                {{end}}
-            </tr>
-        </table>
+        {{if .Active}}
+            <a class="button" href="/project/stop?name={{.Name}}">Остановить</a>
+        {{else}}
+            <a class="button" href="/project/start?name={{.Name}}">Запустить</a>
+            <a class="button" href="/project/remove?name={{.Name}}">Удалить</a>
+        {{end}}
+        <a class="button" href="http://{{.Name}}/" target="_blank">Открыть в новой вкладке</a>
         <h4>Контейнеры:</h4>
         <table>
             <tr>
@@ -95,9 +133,9 @@
                     <td>{{.ContainerName}}</td>
                     <td>
                         {{if .Active}}
-                            Активный
+                            Запущен
                         {{else}}
-                            Неактивный
+                            Остановлн
                         {{end}}
                     </td>
                     <td>{{.CreateTime}}</td>
@@ -133,7 +171,5 @@
         <hr>
     {{end}}
 </div>
-
-<a href="/project/create">Создать проект!</a>
 </body>
 </html>
