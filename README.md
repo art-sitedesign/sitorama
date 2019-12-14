@@ -4,6 +4,7 @@
 ```bash
 git clone https://github.com/art-sitedesign/sitorama.git
 cd sitorama
+git checkout release-v1.0.1
 ```
 
 #### Сборка приложения:
