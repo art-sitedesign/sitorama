@@ -12,4 +12,10 @@ hm.rm:
 	sudo ./host-manager/bin/$(E) -d $(D) -rm
 
 app.build:
-	go build -o ./bin/$(E) ./app/*.go
+	bash ./builder.sh
+
+app.run.mac:
+	./bin/darwin-amd64
+
+app.run.linux:
+	./bin/linux-amd64
