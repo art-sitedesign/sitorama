@@ -17,4 +17,7 @@ const (
 	IndexPHPTemplate = "app/templates/php/index.php"
 
 	ProjectVolumesPath = "sitorama_volumes"
+
+	linuxBinName = "linux-amd64"
+	macOSBinName = "darwin-amd64"
 )

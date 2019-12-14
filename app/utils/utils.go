@@ -114,23 +114,13 @@ func ProjectVolumeFullPath(projectName string, volumeName string) (string, error
 
 // AddHost добавит домен для локального хоста
 func AddHost(name string) error {
-	build := "linux"
-	if isDarwin() {
-		build = "macos"
-	}
-
-	cmd := exec.Command("make", "hm.add", "E="+build, "D="+name)
+	cmd := exec.Command("make", "hm.add", "E="+binName(), "D="+name)
 	return cmd.Run()
 }
 
 // RemoveHost удалит домен для локального хоста
 func RemoveHost(name string) error {
-	build := "linux"
-	if isDarwin() {
-		build = "macos"
-	}
-
-	cmd := exec.Command("make", "hm.rm", "E="+build, "D="+name)
+	cmd := exec.Command("make", "hm.rm", "E="+binName(), "D="+name)
 	return cmd.Run()
 }
 
@@ -159,4 +149,13 @@ func IsPortFree(port int) bool {
 // isDarwin вернет тип ОС. Костыль. Временно. Пока не хочу заморачиваться с нормальным сборщиком под ОС
 func isDarwin() bool {
 	return runtime.GOOS == "darwin"
+}
+
+// binName вернёт название бинарного файла в зависимости от системы
+func binName() string {
+	if isDarwin() {
+		return macOSBinName
+	}
+
+	return linuxBinName
 }

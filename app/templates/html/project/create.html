@@ -75,7 +75,7 @@
             </label>
             {{ range $val, $title := .CacheBuilders}}
                 <label>
-                    <input type="radio" name="cache" value="{{$val}}">
+                    <input type="radio" name="cache" disabled value="{{$val}}">
                     <span>{{$title}}</span>
                 </label>
             {{ end }}

@@ -7,6 +7,11 @@ import (
 	"net/http"
 
 	"github.com/art-sitedesign/sitorama/app/handlers"
+	"github.com/art-sitedesign/sitorama/app/utils"
+)
+
+const (
+	appDefaultPort = 8085
 )
 
 //todo: при получении списка контейнеров запилить сортировку
@@ -43,8 +48,10 @@ func main() {
 	http.HandleFunc("/container/start", handlers.ContainerStart(tmpl))
 	http.HandleFunc("/container/remove", handlers.ContainerRemove(tmpl))
 
-	fmt.Println("Open GUI: http://127.0.0.1:8085")
-	err := http.ListenAndServe(":8085", nil)
+	appPort := utils.FindNearPort(appDefaultPort)
+
+	fmt.Printf("Open GUI: http://127.0.0.1:%d\n", appPort)
+	err := http.ListenAndServe(fmt.Sprintf(":%d", appPort), nil)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
