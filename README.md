@@ -1,5 +1,11 @@
 # sitorama
 
+#### Установка:
+```bash
+git clone https://github.com/art-sitedesign/sitorama.git
+cd sitorama
+```
+
 #### Сборка приложения:
 ```bash
 make app.build

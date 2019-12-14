@@ -14,11 +14,8 @@ const (
 	appDefaultPort = 8085
 )
 
-//todo: при получении списка контейнеров запилить сортировку
 //todo: годоки дописать
-//todo: конструктор приложения
 //todo: логи сервисов прокидывать наружу или в stdout?
-//todo: дождаться выполнения контейнера
 
 func main() {
 	tmpl := template.Must(template.ParseFiles(
